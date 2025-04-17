@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Map;
 
 public class Project {
-    private Integer id;
+    private final Integer id;
     private String name;
     private String neighbourhood;
-    private Map<FlatType, Integer> availableFlats;
+    private final Map<FlatType, Integer> availableFlats;
     private LocalDate applicationOpeningDate;
     private LocalDate applicationClosingDate;
-    private Manager manager;
+    private final Manager manager;
     private boolean visibility;
     private Integer availableOfficerSlots;
     private List<Officer> officers;
@@ -40,13 +40,42 @@ public class Project {
         this.availableOfficerSlots = availableOfficerSlots;
     }
 
+    /**
+     * I dont know the reason for the setter methods for lists.
+     * If the lists are just for storing data, and we are only adding to them, then we can just initialise directly when loading from
+     * persisted data or also do the overloaded method like enquiry.
+     * Just provide getters and adders will do. if not adder, can do .get.add also
+     *
+     * chatgpt:
+     * When Would You Add a Setter?
+     * Only if you want to:
+     *
+     * Replace the whole list at once.
+     *
+     * Load data in bulk (e.g., from a database, file, or API).
+     *
+     * Allow flexibility for unit testing or serialization.
+     *
+     * public void setItems(List<String> items) {
+     *     this.items = new ArrayList<>(items); // with a defensive copy if needed
+     * }
+     *
+     * If we are doing the above then ok no problemo
+     *
+     * Why i use final for all lists also:
+     *
+     * You can’t reassign items to a different list later (e.g., items = new LinkedList<>() will be a compile error).
+     *
+     * But you can still modify the list itself (add, remove, etc.).
+     */
+
     public Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+//    public void setId(Integer id) {
+//        this.id = id;
+//    }
 
     public String getName() {
         return name;

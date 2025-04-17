@@ -18,13 +18,15 @@ public class Enquiry {
     private User respondent;
     private LocalDate dateReplied;
 
-    Enquiry(Project project, Applicant applicant, String enquiry){
+    protected Enquiry(Project project, Applicant applicant, String enquiry){
         this.id = UniqueId.getInstance().getNextEnquiryId();
         this.project = project;
         this.applicant = applicant;
+        this.enquiry = enquiry;
         this.dateEnquired = LocalDate.now();
     }
 
+    // To load data for data persistence
     Enquiry(Integer id, Project project, Applicant applicant, String enquiry, LocalDate dateEnquired, String Reply, User respondent, LocalDate dateReplied) {
         this.id = id;
         this.project = project;
@@ -57,11 +59,11 @@ public class Enquiry {
     }
 
     //package-private
-    void setEnquiry(String enquiry) {
+    protected void setEnquiry(String enquiry) {
         this.enquiry = enquiry;
     }
 
-    void setReply(String reply, User respondent) {
+    protected void setReply(String reply, User respondent) {
         this.reply = reply;
         this.respondent = respondent;
         this.dateReplied = LocalDate.now();
