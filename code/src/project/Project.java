@@ -41,26 +41,11 @@ public class Project {
     }
 
     /**
-     * I dont know the reason for the setter methods for lists.
-     * If the lists are just for storing data, and we are only adding to them, then we can just initialise directly when loading from
-     * persisted data or also do the overloaded method like enquiry.
-     * Just provide getters and adders will do. if not adder, can do .get.add also
+     * i assume setters is used for loading the data from the csv at the start and that should be it
      *
-     * chatgpt:
-     * When Would You Add a Setter?
-     * Only if you want to:
+     * i feel should add adder methods for the lists
      *
-     * Replace the whole list at once.
-     *
-     * Load data in bulk (e.g., from a database, file, or API).
-     *
-     * Allow flexibility for unit testing or serialization.
-     *
-     * public void setItems(List<String> items) {
-     *     this.items = new ArrayList<>(items); // with a defensive copy if needed
-     * }
-     *
-     * If we are doing the above then ok no problemo
+     * and also
      *
      * Why i use final for all lists also:
      *
