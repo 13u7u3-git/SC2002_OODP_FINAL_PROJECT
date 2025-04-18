@@ -1,75 +1,103 @@
 package applicant;
 
+import java.util.Comparator;
 import java.util.List;
 
 import enquiry.Enquiry;
-import enums.ApplicationStatus;
-import enums.FlatType;
-import enums.UserType;
+import enums.*;
 import helper.Color;
+import helper.UniqueId;
+import project.ProjectRegistry;
 import project.ProjectService;
 import user.User;
 import project.Project;
-import enums.BookingStatus;
 
 public class ApplicantService {
-    private static ApplicantService instance = null;
-    ProjectService projectService = ProjectService.getInstance();
 
-    private ApplicantService() {
-        // Private constructor for singleton
+    public ApplicantService() {
     }
 
-    public static ApplicantService getInstance() {
-        if (instance == null) {
-            instance = new ApplicantService();
+    public List<Project> getEligibleProjects(ProjectService projectService, ProjectRegistry projectRegistry, User applicant) {
+        return projectService.getEligibleProjects(projectRegistry, applicant);
+    }
+
+    public Application createApplication(UniqueId uniqueId, Applicant applicant, Project project, FlatType flatType) {
+        boolean hasCurrentApplications = applicant.getApplicationList().stream()
+                .anyMatch(application ->
+                        application.getApplicationStatus() == ApplicationStatus.PENDING ||
+                        application.getApplicationStatus() == ApplicationStatus.SUCCESSFUL ||
+                        application.getBookingStatus() == BookingStatus.PENDING ||
+                        application.getBookingStatus() == BookingStatus.BOOKED);
+
+        if (hasCurrentApplications) {
+            System.out.println("You have already applied for a project.");
+            return null;
         }
-        return instance;
+
+        return new Application(uniqueId.getNextApplicationId(), applicant, project, flatType);
     }
 
-    public void viewEligibleProjects(User user) {
-        // TODO: Implement logic to display eligible projects for the user
-    }
+    public void submitApplication(ProjectService projectService, Application application) {
+        projectService.addApplicationToProject(application);
+        Color.println("Application submitted successfully.", Color.GREEN);
 
-    public Application createApplication(User applicant, Project project, FlatType flatType) {
-        return new Application( applicant, project, flatType);
-    }
-
-    public void submitApplication(Application application) {
-        if(!projectService.addApplicationToProject(application)){
-            Color.println("Application not submitted. Applications are not open for this project.", Color.RED);
-        }
-        else{
-            Color.println("Application submitted successfully.", Color.GREEN);
-        }
     }
 
     public void setApplicationStatus(Application application, ApplicationStatus status) {
         application.setApplicationStatus(status);
     }
 
-    public void viewApplicationStatus(Application application) {
-        Color.println("Application Status: " + application.getApplicationStatus(), Color.BLUE);
+    public List<Application> getAllApplications(Applicant applicant) {
+        return applicant.getApplicationList();
     }
 
-    public void viewProjectAppliedFor(Application application) {
+    public Application getCurrentApplication(Applicant applicant) {
+        List<Application> applications = applicant.getApplicationList();
 
+        return applications.stream()
+                .max(Comparator.comparing(Application::getDateApplied))
+                .orElse(null);
     }
 
     public void withdrawApplication(Application application) {
-        // TODO: Implement logic to withdraw the application
+        if (application == null) {
+            System.out.println("No application to withdraw.");
+            return;
+        }
+
+        application.setWithdrawalRequestStatus(WithdrawalRequestStatus.PENDING);
+        System.out.println("Withdrawal request submitted.");
     }
 
     public void sendBookingRequest(Application application) {
-        // TODO: Implement logic to send booking request
+        if (application == null) {
+            System.out.println("No application to request booking for.");
+            return;
+        }
+
+        if (application.getApplicationStatus() != ApplicationStatus.SUCCESSFUL) {
+            System.out.println("Only successful applicants can request a booking.");
+            return;
+        }
+
+        if (application.getBookingStatus() != BookingStatus.NOT_BOOKED) {
+            System.out.println("Booking request already submitted or processed.");
+            return;
+        }
+
+        application.setBookingStatus(BookingStatus.PENDING);
+        System.out.println("Booking request submitted.");
     }
 
     public void updateBookingStatus(Application application, BookingStatus status) {
-        // TODO: Implement logic to update booking status
-    }
+        if (application == null) {
+            System.out.println("Invalid application.");
+            return;
+        }
 
-    public void viewAllProjects() {
-        // TODO: Implement logic to display all available projects
+        if (application.getBookingStatus() != BookingStatus.PENDING) {
+            System.out.println("Booking is not pending. Current status: " + application.getBookingStatus());
+        }
     }
 
     //validate current applicant

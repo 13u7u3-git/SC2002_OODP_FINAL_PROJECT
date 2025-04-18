@@ -9,7 +9,7 @@ import user.User;
 import java.time.LocalDate;
 
 public class Enquiry {
-    private final Integer id;
+    private final int id;
     private final Project project;
     private final Applicant applicant;
     private final LocalDate dateEnquired;
@@ -18,8 +18,8 @@ public class Enquiry {
     private User respondent;
     private LocalDate dateReplied;
 
-    protected Enquiry(Project project, Applicant applicant, String enquiry){
-        this.id = UniqueId.getInstance().getNextEnquiryId();
+    protected Enquiry(int id, Project project, Applicant applicant, String enquiry){
+        this.id = id;
         this.project = project;
         this.applicant = applicant;
         this.enquiry = enquiry;
@@ -27,7 +27,7 @@ public class Enquiry {
     }
 
     // To load data for data persistence
-    Enquiry(Integer id, Project project, Applicant applicant, String enquiry, LocalDate dateEnquired, String Reply, User respondent, LocalDate dateReplied) {
+    Enquiry(int id, Project project, Applicant applicant, String enquiry, LocalDate dateEnquired, String Reply, User respondent, LocalDate dateReplied) {
         this.id = id;
         this.project = project;
         this.applicant = applicant;

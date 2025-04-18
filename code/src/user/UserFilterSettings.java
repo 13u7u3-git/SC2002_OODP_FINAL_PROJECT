@@ -8,16 +8,14 @@ public class UserFilterSettings {
     private String projectName;
     private String neighbourhood;
     private FlatType flatType;
-    private LocalDate applicationOpeningDate;
-    private LocalDate applicationClosingDate;
+    private LocalDate date;
     private String sortOrder;
 
     public UserFilterSettings() {
         this.projectName = null;
         this.neighbourhood = null;
         this.flatType = null;
-        this.applicationOpeningDate = null;
-        this.applicationClosingDate = null;
+        this.date = null;
         this.sortOrder = "alphabetical"; // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     }
 
@@ -45,20 +43,12 @@ public class UserFilterSettings {
         this.flatType = flatType;
     }
 
-    public LocalDate getApplicationOpeningDate() {
-        return applicationOpeningDate;
+    public LocalDate getDate(LocalDate date) {
+        return date;
     }
 
-    public void setApplicationOpeningDate(LocalDate applicationOpeningDate) {
-        this.applicationOpeningDate = applicationOpeningDate;
-    }
-
-    public LocalDate getApplicationClosingDate() {
-        return applicationClosingDate;
-    }
-
-    public void setApplicationClosingDate(LocalDate applicationClosingDate) {
-        this.applicationClosingDate = applicationClosingDate;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public String getSortOrder() {
@@ -73,8 +63,7 @@ public class UserFilterSettings {
         projectName = null;
         neighbourhood = null;
         flatType = null;
-        applicationOpeningDate = null;
-        applicationClosingDate = null;
+        date = null;
         sortOrder = "alphabetical";
     }
 }
