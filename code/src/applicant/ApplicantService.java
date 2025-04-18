@@ -17,10 +17,8 @@ public class ApplicantService {
     public ApplicantService() {
     }
 
-    public void viewEligibleProjects(ProjectService projectService, ProjectRegistry projectRegistry, User applicant) {
-        List<Project> projects = projectService.getEligibleProjects(projectRegistry, applicant);
-        System.out.println("List of eligible projects:");
-        projects.forEach(System.out::println);
+    public List<Project> getEligibleProjects(ProjectService projectService, ProjectRegistry projectRegistry, User applicant) {
+        return projectService.getEligibleProjects(projectRegistry, applicant);
     }
 
     public Application createApplication(UniqueId uniqueId, Applicant applicant, Project project, FlatType flatType) {
@@ -49,12 +47,11 @@ public class ApplicantService {
         application.setApplicationStatus(status);
     }
 
-    public void viewAllApplications(Applicant applicant) {
-        applicant.getApplicationList()
-                .forEach(System.out::println);
+    public List<Application> getAllApplications(Applicant applicant) {
+        return applicant.getApplicationList();
     }
 
-    private Application getCurrentApplication(Applicant applicant) {
+    public Application getCurrentApplication(Applicant applicant) {
         List<Application> applications = applicant.getApplicationList();
 
         return applications.stream()

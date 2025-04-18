@@ -27,26 +27,36 @@ public class EnquiryService {
         Color.println("Enquiry submitted successfully.", Color.GREEN);
     }
 
-    public void viewEnquiry(List<Enquiry> enquiries) {
-        System.out.println("Your enquiries:");
-        enquiries.forEach(System.out::println);
-    }
-
     // manager wont even have the option to edit enquiry in menu
-    public void editEnquiry(Enquiry enquiry, String newMessage) {
-        if (newMessage == null) {
+    // have to make sure that they edit their own enquiry.
+    public void editEnquiry(Applicant currentUser, Enquiry enquiry, String newMessage) {
+        if (!enquiry.getApplicant().equals(currentUser)) {
+            Color.println("You are not allowed to edit this enquiry.", Color.RED);
+            return;
+        }
+
+        if (newMessage == null || newMessage.isBlank()) {
             Color.println("You must write something.", Color.RED);
+            return;
         }
 
         enquiry.setEnquiry(newMessage);
         Color.println("Enquiry edited successfully.", Color.GREEN);
     }
 
-    // app / off wont even have the option to delete in menu. They will never touch this function.
-    public void deleteEnquiry(Enquiry enquiry) {
+
+    // manager wont even have the option to delete. Need to confirm that current user deletes their own enquiry.
+    // user cannot put random enquiry id and then it deletes that enquiry.
+    public void deleteEnquiry(Applicant currentUser, Enquiry enquiry) {
+        if (!enquiry.getApplicant().equals(currentUser)) {
+            Color.println("You are not allowed to delete this enquiry.", Color.RED);
+            return;
+        }
+
         projectService.removeEnquiryFromProject(enquiry);
         Color.println("Enquiry deleted successfully.", Color.GREEN);
     }
+
 
 
     public void replyToEnquiry(Enquiry enquiry, String reply, SessionManager sessionManager) {
@@ -58,7 +68,11 @@ public class EnquiryService {
 
     }
 
-    public void viewEnquiriesFrom(Project project) {
+    public List<Enquiry> getEnquiriesForApplicant() {
+        return null;
+    }
+
+    public void getEnquiriesFrom(Project project) {
         List<Enquiry> enquiries = projectService.getAllEnquiriesFrom(project);
 
         // Print project header once
@@ -89,7 +103,7 @@ public class EnquiryService {
         }
     }
 
-    public void viewEnquiresFromAllProjects(ProjectRegistry projectRegistry) {
+    public void getEnquiresFromAllProjects(ProjectRegistry projectRegistry) {
         List<Enquiry> enquiries = projectService.getAllEnquiriesFromAllProjects(projectRegistry);
         Integer currentProjectId = null;
 
