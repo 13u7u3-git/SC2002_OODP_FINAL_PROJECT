@@ -1,74 +1,61 @@
 package enquiry;
 
-import java.util.List;
-
 import applicant.Applicant;
-import applicant.ApplicantService;
 import helper.Color;
+import helper.UniqueId;
 import project.Project;
+import project.ProjectRegistry;
 import project.ProjectService;
 import system.SessionManager;
-import user.User;
+
+import java.util.List;
 
 public class EnquiryService {
-    private static EnquiryService instance;
-    ProjectService projectService = ProjectService.getInstance();
-    ApplicantService applicantService = ApplicantService.getInstance();
-    SessionManager sessionManager = SessionManager.getInstance();
+    private final ProjectService projectService;
 
-    private EnquiryService() {
+    public EnquiryService(final ProjectService projectService) {
+        this.projectService = projectService;
     }
 
-    public static EnquiryService getInstance() {
-        if (instance == null) {
-            instance = new EnquiryService();
-        }
-        return instance;
-    }
-
-    public Enquiry createEnquiry(Project project, String message) {
-        return new Enquiry(project, (Applicant) sessionManager.getCurrentUser(), message);
+    public Enquiry createEnquiry(UniqueId uniqueId, Project project, Applicant applicant, String message) {
+        return new Enquiry(uniqueId.getNextEnquiryId(), project, applicant, message);
     }
 
     public void submitEnquiry(Enquiry enquiry) {
-        //enquiry.getProject().getEnquiries().add(enquiry);//illegal > encapsulation violation
-
         // Enquiry service tells project enquiry: here's your enquiry, figure out which project it belongs to yourself
-        projectService.addEnquiryToProject(enquiry); // correct way
+        projectService.addEnquiryToProject(enquiry);
+        Color.println("Enquiry submitted successfully.", Color.GREEN);
     }
 
-    public void viewEnquiry(Enquiry enquiry) {
-        Color.println(enquiry.toString(), Color.CYAN);
+    public void viewEnquiry(List<Enquiry> enquiries) {
+        System.out.println("Your enquiries:");
+        enquiries.forEach(System.out::println);
     }
 
+    // manager wont even have the option to edit enquiry in menu
     public void editEnquiry(Enquiry enquiry, String newMessage) {
-        if(!applicantService.validateApplicant((Applicant) sessionManager.getCurrentUser(),enquiry))
-            Color.println("You are not authorized to delete this enquiry.", Color.RED);
-        else {
-            Color.println("Enquiry edited successfully.", Color.GREEN);
-            enquiry.setEnquiry(newMessage);
+        if (newMessage == null) {
+            Color.println("You must write something.", Color.RED);
         }
+
+        enquiry.setEnquiry(newMessage);
+        Color.println("Enquiry edited successfully.", Color.GREEN);
     }
 
+    // app / off wont even have the option to delete in menu. They will never touch this function.
     public void deleteEnquiry(Enquiry enquiry) {
-        //enquiry.getProject().getEnquiries().remove(enquiry);
-        //enquiry.getApplicant().removeEnquiry(enquiry); //illegal > encapsulation violation
-        if(!applicantService.validateApplicant((Applicant) sessionManager.getCurrentUser(),enquiry))
-            Color.println("You are not authorized to delete this enquiry.", Color.RED);
-        else{
-            Color.println("Enquiry deleted successfully.", Color.GREEN);
-            projectService.removeEnquiryFromProject(enquiry); // correct way
-        }
+        projectService.removeEnquiryFromProject(enquiry);
+        Color.println("Enquiry deleted successfully.", Color.GREEN);
     }
 
-    public void replyToEnquiry(Enquiry enquiry, String reply) {
-        if (projectService.isProjectStaff(sessionManager.getCurrentUser(), enquiry.getProject())) {
+
+    public void replyToEnquiry(Enquiry enquiry, String reply, SessionManager sessionManager) {
+        if (enquiry.getReply().isEmpty()) {
             enquiry.setReply(reply, sessionManager.getCurrentUser());
             Color.println("Enquiry replied successfully.", Color.GREEN);
         }
-        else {
-            Color.println("You are not authorized to reply to this enquiry.", Color.RED);
-        }
+        Color.println("Enquiry already has reply.", Color.RED);
+
     }
 
     public void viewEnquiriesFrom(Project project) {
@@ -76,7 +63,7 @@ public class EnquiryService {
 
         // Print project header once
         Color.println("\nProject: " + project.getName() +
-                     " (ID: " + project.getId() + ")", Color.YELLOW);
+                " (ID: " + project.getId() + ")", Color.YELLOW);
 
         if (enquiries.isEmpty()) {
             Color.println("  No enquiries for this project.", Color.RED);
@@ -93,7 +80,7 @@ public class EnquiryService {
             if (enquiry.getReply() != null && !enquiry.getReply().isEmpty()) {
                 Color.println("  Reply: " + enquiry.getReply(), Color.GREEN);
                 Color.println("  Responded by: " + enquiry.getRespondent().getName() +
-                             " on " + enquiry.getDateReplied(), Color.GREEN);
+                        " on " + enquiry.getDateReplied(), Color.GREEN);
             } else {
                 Color.println("  Status: Pending reply", Color.RED);
             }
@@ -102,8 +89,8 @@ public class EnquiryService {
         }
     }
 
-    public void viewEnquiresFromAllProject() {
-        List<Enquiry> enquiries = projectService.getAllEnquiresFromAllProjects();
+    public void viewEnquiresFromAllProjects(ProjectRegistry projectRegistry) {
+        List<Enquiry> enquiries = projectService.getAllEnquiriesFromAllProjects(projectRegistry);
         Integer currentProjectId = null;
 
         for(Enquiry enquiry : enquiries){
@@ -111,7 +98,7 @@ public class EnquiryService {
             if (!enquiry.getProject().getId().equals(currentProjectId)) {
                 currentProjectId = enquiry.getProject().getId();
                 Color.println("\nProject: " + enquiry.getProject().getName() +
-                             " (ID: " + currentProjectId + ")", Color.YELLOW);
+                        " (ID: " + currentProjectId + ")", Color.YELLOW);
                 Color.println("  -----------------------------", Color.CYAN);
             }
 
@@ -124,7 +111,7 @@ public class EnquiryService {
             if (enquiry.getReply() != null && !enquiry.getReply().isEmpty()) {
                 Color.println("  Reply: " + enquiry.getReply(), Color.GREEN);
                 Color.println("  Responded by: " + enquiry.getRespondent().getName() +
-                             " on " + enquiry.getDateReplied(), Color.GREEN);
+                        " on " + enquiry.getDateReplied(), Color.GREEN);
             } else {
                 Color.println("  Status: Pending reply", Color.RED);
             }

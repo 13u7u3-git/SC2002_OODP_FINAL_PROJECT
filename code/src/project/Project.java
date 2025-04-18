@@ -3,7 +3,6 @@ package project;
 import applicant.Application;
 import enquiry.Enquiry;
 import enums.FlatType;
-import helper.UniqueId;
 import manager.Manager;
 import officer.Officer;
 import officer.RegistrationForm;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Project {
-    private final Integer id;
+    private final int id;
     private String name;
     private String neighbourhood;
     private final Map<FlatType, Integer> availableFlats;
@@ -29,9 +28,9 @@ public class Project {
     private final List<Enquiry> enquiries;
 
     // Use this when Manager wants to create a new project
-    public Project(final UniqueId id, String name, String neighbourhood, Map<FlatType, Integer> availableFlats,
+    public Project(int id, String name, String neighbourhood, Map<FlatType, Integer> availableFlats,
                    LocalDate applicationOpeningDate, LocalDate applicationClosingDate, Manager manager, boolean visibility) {
-        this.id = id.getNextProjectId();
+        this.id = id;
         this.name = name;
         this.neighbourhood = neighbourhood;
         this.availableFlats = availableFlats;
@@ -47,7 +46,7 @@ public class Project {
     }
 
     // Use this when loading from csv
-    public Project(Integer id, String name, String neighbourhood, Map<FlatType, Integer> availableFlats,
+    public Project(int id, String name, String neighbourhood, Map<FlatType, Integer> availableFlats,
                    LocalDate applicationOpeningDate, LocalDate applicationClosingDate, Manager manager,
                    boolean visibility, Integer availableOfficerSlots, List<Officer> officers, List<RegistrationForm> registrationForms,
                    List<Application> applications, List<Enquiry> enquiries) {
@@ -140,5 +139,17 @@ public class Project {
 
     public List<Enquiry> getEnquiries() {
         return enquiries;
+    }
+
+    @Override
+    public String toString() {
+        return "Project {" +
+                "ID=" + id +
+                ", Name=" + name +
+                ", Neighbourhood=" + neighbourhood +
+                ", Available Flats=" + availableFlats +
+                ", Application Opening Date=" + applicationOpeningDate +
+                ", Application Closing Date=" + applicationClosingDate +
+                '}';
     }
 }
