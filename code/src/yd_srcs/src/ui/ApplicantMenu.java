@@ -1,4 +1,4 @@
-package ui;
-
-public class ApplicantMenu {
-}
+//package ui;
+//
+//public class ApplicantMenu {
+//}

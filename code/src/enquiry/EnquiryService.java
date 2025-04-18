@@ -32,6 +32,8 @@ public class EnquiryService {
 
     public void submitEnquiry(Enquiry enquiry) {
         //enquiry.getProject().getEnquiries().add(enquiry);//illegal > encapsulation violation
+
+        // Enquiry service tells project enquiry: here's your enquiry, figure out which project it belongs to yourself
         projectService.addEnquiryToProject(enquiry); // correct way
     }
 

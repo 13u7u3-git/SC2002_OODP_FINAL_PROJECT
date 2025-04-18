@@ -35,6 +35,7 @@ public class ApplicantService {
         return new Application( applicant, project, flatType);
     }
 
+    // applicant service is like: i'll just give u the application and u being project service will sort out which project it belongs to yourself
     public void submitApplication(Application application) {
         if(!projectService.addApplicationToProject(application)){
             Color.println("Application not submitted. Applications are not open for this project.", Color.RED);

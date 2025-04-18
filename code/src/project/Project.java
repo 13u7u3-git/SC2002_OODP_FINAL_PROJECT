@@ -3,11 +3,13 @@ package project;
 import applicant.Application;
 import enquiry.Enquiry;
 import enums.FlatType;
+import helper.UniqueId;
 import manager.Manager;
 import officer.Officer;
 import officer.RegistrationForm;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,14 +23,34 @@ public class Project {
     private final Manager manager;
     private boolean visibility;
     private Integer availableOfficerSlots;
-    private List<Officer> officers;
-    private List<RegistrationForm> registrationForms;
-    private List<Application> applications;
-    private List<Enquiry> enquiries;
+    private final List<Officer> officers;
+    private final List<RegistrationForm> registrationForms;
+    private final List<Application> applications;
+    private final List<Enquiry> enquiries;
 
+    // Use this when Manager wants to create a new project
+    public Project(final UniqueId id, String name, String neighbourhood, Map<FlatType, Integer> availableFlats,
+                   LocalDate applicationOpeningDate, LocalDate applicationClosingDate, Manager manager, boolean visibility) {
+        this.id = id.getNextProjectId();
+        this.name = name;
+        this.neighbourhood = neighbourhood;
+        this.availableFlats = availableFlats;
+        this.applicationOpeningDate = applicationOpeningDate;
+        this.applicationClosingDate = applicationClosingDate;
+        this.manager = manager;
+        this.visibility = visibility;
+        this.availableOfficerSlots = 10;
+        this.officers = new ArrayList<>();
+        this.registrationForms = new ArrayList<>();
+        this.applications = new ArrayList<>();
+        this.enquiries = new ArrayList<>();
+    }
+
+    // Use this when loading from csv
     public Project(Integer id, String name, String neighbourhood, Map<FlatType, Integer> availableFlats,
                    LocalDate applicationOpeningDate, LocalDate applicationClosingDate, Manager manager,
-                   boolean visibility, Integer availableOfficerSlots) {
+                   boolean visibility, Integer availableOfficerSlots, List<Officer> officers, List<RegistrationForm> registrationForms,
+                   List<Application> applications, List<Enquiry> enquiries) {
         this.id = id;
         this.name = name;
         this.neighbourhood = neighbourhood;
@@ -38,29 +60,15 @@ public class Project {
         this.manager = manager;
         this.visibility = visibility;
         this.availableOfficerSlots = availableOfficerSlots;
+        this.officers = officers;
+        this.registrationForms = registrationForms;
+        this.applications = applications;
+        this.enquiries = enquiries;
     }
-
-    /**
-     * i assume setters is used for loading the data from the csv at the start and that should be it
-     *
-     * i feel should add adder methods for the lists
-     *
-     * and also
-     *
-     * Why i use final for all lists also:
-     *
-     * You can’t reassign items to a different list later (e.g., items = new LinkedList<>() will be a compile error).
-     *
-     * But you can still modify the list itself (add, remove, etc.).
-     */
 
     public Integer getId() {
         return id;
     }
-
-//    public void setId(Integer id) {
-//        this.id = id;
-//    }
 
     public String getName() {
         return name;
@@ -80,10 +88,6 @@ public class Project {
 
     public Map<FlatType, Integer> getAvailableFlats() {
         return availableFlats;
-    }
-
-    public void setAvailableFlats(Map<FlatType, Integer> availableFlats) {
-        this.availableFlats = availableFlats;
     }
 
     public LocalDate getApplicationOpeningDate() {
@@ -106,10 +110,6 @@ public class Project {
         return manager;
     }
 
-    public void setManager(Manager manager) {
-        this.manager = manager;
-    }
-
     public boolean isVisibility() {
         return visibility;
     }
@@ -130,31 +130,15 @@ public class Project {
         return officers;
     }
 
-    public void setOfficers(List<Officer> officers) {
-        this.officers = officers;
-    }
-
     public List<RegistrationForm> getRegistrationForms() {
         return registrationForms;
-    }
-
-    public void setRegistrationForms(List<RegistrationForm> registrationForms) {
-        this.registrationForms = registrationForms;
     }
 
     public List<Application> getApplications() {
         return applications;
     }
 
-    public void setApplications(List<Application> applications) {
-        this.applications = applications;
-    }
-
     public List<Enquiry> getEnquiries() {
         return enquiries;
-    }
-
-    public void setEnquiries(List<Enquiry> enquiries) {
-        this.enquiries = enquiries;
     }
 }
