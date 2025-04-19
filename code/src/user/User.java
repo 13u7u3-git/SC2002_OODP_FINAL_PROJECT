@@ -1,66 +1,70 @@
 package user;
-import enums.MaritalStatus;
-import enums.UserType;
-import user.UserFilterSettings;
 
-public abstract class User {
-    private final String name;
-    private final String nric;
-    private String password;
-    private final int age;
-    private final MaritalStatus maritalStatus;
-    private UserFilterSettings filterSettings;
-    private final UserType userType;
+import java.io.Serializable;
 
-    public User(String name, String nric, String password, int age, MaritalStatus maritalStatus,
-                UserFilterSettings filterSettings, UserType userType) {
-        this.name = name;
-        this.nric = nric;
-        this.password = password;
-        this.age = age;
-        this.maritalStatus = maritalStatus;
-        this.filterSettings = filterSettings;
-        this.userType = userType;
-    }
+public class User implements Serializable {
+   private final String name;
+   private final String nric;
+   private final int age;
+   private final MaritalStatus maritalStatus;
+   private String password;
+   private UserFilterSettings filterSettings;
 
-    public String getName() {
-        return name;
-    }
+   public User() {
+      this.name = null;
+      this.nric = null;
+      this.password = null;
+      this.age = 0;
+      this.maritalStatus = null;
+      this.filterSettings = null;
+   }
 
-    public String getNric() {
-        return nric;
-    }
+   public User(String name, String nric, String password, int age, MaritalStatus maritalStatus,
+               UserFilterSettings filterSettings) {
+      this.name = name;
+      this.nric = nric;
+      this.password = password;
+      this.age = age;
+      this.maritalStatus = maritalStatus;
+      this.filterSettings = filterSettings;
+   }
 
-    public String getPassword() {
-        return password;
-    }
+   public String getName() {
+      return name;
+   }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+   public String getNric() {
+      return nric;
+   }
 
-    public int getAge() {
-        return age;
-    }
+   public String getPassword() {
+      return password;
+   }
 
-    public MaritalStatus getMaritalStatus() {
-        return maritalStatus;
-    }
+   public void setPassword(String password) {
+      this.password = password;
+   }
 
-    public UserFilterSettings getFilterSettings() {
-        return filterSettings;
-    }
+   public int getAge() {
+      return age;
+   }
 
-    public void setFilterSettings(UserFilterSettings filterSettings) {
-        this.filterSettings = filterSettings;
-    }
+   public MaritalStatus getMaritalStatus() {
+      return maritalStatus;
+   }
 
-    public UserType getUserType() {
-        return userType;
-    }
+   public UserFilterSettings getFilterSettings() {
+      return filterSettings;
+   }
 
-    public abstract void displayMenu();
+   public void setFilterSettings(UserFilterSettings filterSettings) {
+      this.filterSettings = filterSettings;
+   }
+
+
 }
+
+
 
 
 

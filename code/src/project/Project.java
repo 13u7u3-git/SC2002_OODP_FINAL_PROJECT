@@ -2,154 +2,140 @@ package project;
 
 import applicant.Application;
 import enquiry.Enquiry;
-import enums.FlatType;
-import manager.Manager;
-import officer.Officer;
 import officer.RegistrationForm;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Project {
-    private final int id;
-    private String name;
-    private String neighbourhood;
-    private final Map<FlatType, Integer> availableFlats;
-    private LocalDate applicationOpeningDate;
-    private LocalDate applicationClosingDate;
-    private final Manager manager;
-    private boolean visibility;
-    private Integer availableOfficerSlots;
-    private final List<Officer> officers;
-    private final List<RegistrationForm> registrationForms;
-    private final List<Application> applications;
-    private final List<Enquiry> enquiries;
+public class Project implements Serializable {
+   @Serial
+   private static final long serialVersionUID = 1L;
+   // =================== Immutable Project Details =================== (never modified, at least not directly, only through the setter methods)
+   private final Integer id;//automatically generated
+   private final String manager;
+   private final Map<FlatType, Double> flatPrices;
+   private final Map<FlatType, Integer> availableFlats;
+   private final Map<FlatType, Integer> remainingFlats;//Officer can modify
+   private final List<String> officers;
+   private final List<RegistrationForm> registrationForms = new ArrayList<>();
+   private final List<Application> applications = new ArrayList<>();
+   private final List<Enquiry> enquiries = new ArrayList<>();
 
-    // Use this when Manager wants to create a new project
-    public Project(int id, String name, String neighbourhood, Map<FlatType, Integer> availableFlats,
-                   LocalDate applicationOpeningDate, LocalDate applicationClosingDate, Manager manager, boolean visibility) {
-        this.id = id;
-        this.name = name;
-        this.neighbourhood = neighbourhood;
-        this.availableFlats = availableFlats;
-        this.applicationOpeningDate = applicationOpeningDate;
-        this.applicationClosingDate = applicationClosingDate;
-        this.manager = manager;
-        this.visibility = visibility;
-        this.availableOfficerSlots = 10;
-        this.officers = new ArrayList<>();
-        this.registrationForms = new ArrayList<>();
-        this.applications = new ArrayList<>();
-        this.enquiries = new ArrayList<>();
-    }
+   // =================== Mutable Project Metadata ===================
+   private String projectName;
+   private String neighbourhood;
+   private LocalDate applicationOpeningDate;
+   private LocalDate applicationClosingDate;
+   private boolean visibility = false;
+   private Integer availableOfficerSlots;
 
-    // Use this when loading from csv
-    public Project(int id, String name, String neighbourhood, Map<FlatType, Integer> availableFlats,
-                   LocalDate applicationOpeningDate, LocalDate applicationClosingDate, Manager manager,
-                   boolean visibility, Integer availableOfficerSlots, List<Officer> officers, List<RegistrationForm> registrationForms,
-                   List<Application> applications, List<Enquiry> enquiries) {
-        this.id = id;
-        this.name = name;
-        this.neighbourhood = neighbourhood;
-        this.availableFlats = availableFlats;
-        this.applicationOpeningDate = applicationOpeningDate;
-        this.applicationClosingDate = applicationClosingDate;
-        this.manager = manager;
-        this.visibility = visibility;
-        this.availableOfficerSlots = availableOfficerSlots;
-        this.officers = officers;
-        this.registrationForms = registrationForms;
-        this.applications = applications;
-        this.enquiries = enquiries;
-    }
+   // Use this when Manager wants to create a new project
+   public Project(int id, String projectName, String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
+                  Integer threeRoomUnits, Double threeRoomPrice, LocalDate applicationOpeningDate,
+                  LocalDate applicationClosingDate, String manager, Integer availableOfficerSlots,
+                  List<String> officers) {
+      this.id = id;
+      this.projectName = projectName;
+      this.neighbourhood = neighbourhood;
+      this.flatPrices = Map.of(FlatType.TWO_ROOM, twoRoomPrice, FlatType.THREE_ROOM, threeRoomPrice);
+      this.availableFlats = Map.of(FlatType.TWO_ROOM, twoRoomUnits, FlatType.THREE_ROOM, threeRoomUnits);
+      this.remainingFlats = Map.of(FlatType.TWO_ROOM, twoRoomUnits, FlatType.THREE_ROOM, threeRoomUnits);
+      this.applicationOpeningDate = applicationOpeningDate;
+      this.applicationClosingDate = applicationClosingDate;
+      this.manager = manager;
+      this.availableOfficerSlots = availableOfficerSlots;
+      this.officers = officers;
+   }
+   // =================== Immutable Project Details ===================
 
-    public Integer getId() {
-        return id;
-    }
+   public Integer getId() {
+      return id;
+   }
 
-    public String getName() {
-        return name;
-    }
+   public String getManager() {
+      return manager;
+   }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+   public Map<FlatType, Double> getFlatPrices() {
+      return flatPrices;
+   }
 
-    public String getNeighbourhood() {
-        return neighbourhood;
-    }
+   public Map<FlatType, Integer> getAvailableFlats() {
+      return availableFlats;
+   }
 
-    public void setNeighbourhood(String neighbourhood) {
-        this.neighbourhood = neighbourhood;
-    }
+   public Map<FlatType, Integer> getRemainingFlats() {
+      return remainingFlats;
+   }
 
-    public Map<FlatType, Integer> getAvailableFlats() {
-        return availableFlats;
-    }
+   public List<String> getOfficers() {
+      return officers;
+   }
 
-    public LocalDate getApplicationOpeningDate() {
-        return applicationOpeningDate;
-    }
+   public List<RegistrationForm> getRegistrationForms() {
+      return registrationForms;
+   }
 
-    public void setApplicationOpeningDate(LocalDate applicationOpeningDate) {
-        this.applicationOpeningDate = applicationOpeningDate;
-    }
+   public List<Application> getApplications() {
+      return applications;
+   }
 
-    public LocalDate getApplicationClosingDate() {
-        return applicationClosingDate;
-    }
+   public List<Enquiry> getEnquiries() {
+      return enquiries;
+   }
 
-    public void setApplicationClosingDate(LocalDate applicationClosingDate) {
-        this.applicationClosingDate = applicationClosingDate;
-    }
+   public String getProjectName() {
+      return projectName;
+   }
 
-    public Manager getManager() {
-        return manager;
-    }
+   public void setProjectName(String projectName) {
+      this.projectName = projectName;
+   }
 
-    public boolean isVisibility() {
-        return visibility;
-    }
+   public String getNeighbourhood() {
+      return neighbourhood;
+   }
 
-    public void setVisibility(boolean visibility) {
-        this.visibility = visibility;
-    }
+   public void setNeighbourhood(String neighbourhood) {
+      this.neighbourhood = neighbourhood;
+   }
 
-    public Integer getAvailableOfficerSlots() {
-        return availableOfficerSlots;
-    }
+   public LocalDate getApplicationOpeningDate() {
+      return applicationOpeningDate;
+   }
 
-    public void setAvailableOfficerSlots(Integer availableOfficerSlots) {
-        this.availableOfficerSlots = availableOfficerSlots;
-    }
+   public void setApplicationOpeningDate(LocalDate applicationOpeningDate) {
+      this.applicationOpeningDate = applicationOpeningDate;
+   }
 
-    public List<Officer> getOfficers() {
-        return officers;
-    }
+   public LocalDate getApplicationClosingDate() {
+      return applicationClosingDate;
+   }
 
-    public List<RegistrationForm> getRegistrationForms() {
-        return registrationForms;
-    }
+   public void setApplicationClosingDate(LocalDate applicationClosingDate) {
+      this.applicationClosingDate = applicationClosingDate;
+   }
 
-    public List<Application> getApplications() {
-        return applications;
-    }
+   public boolean isVisibility() {
+      return visibility;
+   }
 
-    public List<Enquiry> getEnquiries() {
-        return enquiries;
-    }
+   public void setVisibility(boolean visibility) {
+      this.visibility = visibility;
+   }
 
-    @Override
-    public String toString() {
-        return "Project {" +
-                "ID=" + id +
-                ", Name=" + name +
-                ", Neighbourhood=" + neighbourhood +
-                ", Available Flats=" + availableFlats +
-                ", Application Opening Date=" + applicationOpeningDate +
-                ", Application Closing Date=" + applicationClosingDate +
-                '}';
-    }
+   public Integer getAvailableOfficerSlots() {
+      return availableOfficerSlots;
+   }
+
+   public void setAvailableOfficerSlots(Integer availableOfficerSlots) {
+      this.availableOfficerSlots = availableOfficerSlots;
+   }
+// =================== Mutable Project Metadata ===================
 }
+
+

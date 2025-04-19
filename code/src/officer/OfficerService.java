@@ -2,8 +2,8 @@
 //
 //import java.util.List;
 //import applicant.Application;
-//import enums.ApplicationStatus;
-//import enums.FlatType;
+//import applicant.ApplicationStatus;
+//import project.FlatType;
 //import project.Project;
 //import officer.RegistrationForm;
 //import applicant.ApplicantService;

@@ -1,56 +1,54 @@
 package officer;
 
-import enums.OfficerRegistrationStatus;
-import helper.UniqueId;
 import project.Project;
 
 import java.time.LocalDate;
 
 public class RegistrationForm {
-    private final int id;
-    private final Officer officer;
-    private final Project project;
-    private OfficerRegistrationStatus registrationStatus;
-    private final LocalDate dateApplied;
+   private final int id;
+   private final Officer officer;
+   private final Project project;
+   private final LocalDate dateApplied;
+   private OfficerRegistrationStatus registrationStatus;
 
-    public RegistrationForm(int id, Officer officer, Project project) {
-        this.id = id;
-        this.officer = officer;
-        this.project = project;
-        this.registrationStatus = OfficerRegistrationStatus.PENDING;
-        this.dateApplied = LocalDate.now();
-    }
+   public RegistrationForm(int id, Officer officer, Project project) {
+      this.id = id;
+      this.officer = officer;
+      this.project = project;
+      this.registrationStatus = OfficerRegistrationStatus.PENDING;
+      this.dateApplied = LocalDate.now();
+   }
 
-    // to load data for data persistence.
-    public RegistrationForm(int id, Officer officer, Project project, OfficerRegistrationStatus registrationStatus, LocalDate dateApplied) {
-        this.id = id;
-        this.officer = officer;
-        this.project = project;
-        this.registrationStatus = registrationStatus;
-        this.dateApplied = dateApplied;
-    }
+   // to load data for data persistence.
+   public RegistrationForm(int id, Officer officer, Project project, OfficerRegistrationStatus registrationStatus, LocalDate dateApplied) {
+      this.id = id;
+      this.officer = officer;
+      this.project = project;
+      this.registrationStatus = registrationStatus;
+      this.dateApplied = dateApplied;
+   }
 
-    public int getId() {
-        return id;
-    }
+   public int getId() {
+      return id;
+   }
 
-    public Officer getOfficer() {
-        return officer;
-    }
+   public Officer getOfficer() {
+      return officer;
+   }
 
-    public Project getProject() {
-        return project;
-    }
+   public Project getProject() {
+      return project;
+   }
 
-    public OfficerRegistrationStatus getRegistrationStatus() {
-        return registrationStatus;
-    }
+   public OfficerRegistrationStatus getRegistrationStatus() {
+      return registrationStatus;
+   }
 
-    public void setRegistrationStatus(OfficerRegistrationStatus registrationStatus) {
-        this.registrationStatus = registrationStatus;
-    }
+   public void setRegistrationStatus(OfficerRegistrationStatus registrationStatus) {
+      this.registrationStatus = registrationStatus;
+   }
 
-    public LocalDate getDateApplied() {
-        return dateApplied;
-    }
+   public LocalDate getDateApplied() {
+      return dateApplied;
+   }
 }
