@@ -18,7 +18,7 @@ public class ImmutableProjectView {
    }
 
    public String getNeighbourhood() {
-      return project.getNeighbourhood();
+      return project.getNeighborhood();
    }
 
    public Map<FlatType, Integer> getAvailableFlats() {

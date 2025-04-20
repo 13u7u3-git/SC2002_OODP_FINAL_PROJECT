@@ -5,12 +5,16 @@ import UniqueID.UniqueId;
 import UniqueID.UniqueIdService;
 import applicant.Applicant;
 import helper.Color;
+import helper.ProjectRegistryLoader.ProjectRegistryLoadingController;
+import helper.ProjectRegistryLoader.ProjectStaffLinker;
+import helper.UserRegistryLoader.UserRegistryLoadingController;
 import interfaces.Menu;
 import manager.*;
-import officer.Officer;
+import officer.*;
+import project.IProjectService;
 import project.ProjectRegistry;
 import project.ProjectService;
-import user.UserRegistry;
+import user.*;
 
 import java.util.Scanner;
 
@@ -21,30 +25,34 @@ public class EntryPoint {
       UniqueId uniqueId = new UniqueId();
       uniqueId.loadFromPropertiesFile();
       IUniqueIdService uniqueIdService = new UniqueIdService(uniqueId);
-
+      IPasswordValidationService passwordValidationService = new PasswordValidationService();
       // Initialize system components with proper dependency injection
       Scanner scanner = new Scanner(System.in);
 
       // Initialize UserRegistry and ProjectRegistry from Text Files (Only once)
-      /*UserRegistryLoadingController userRegistryLoadingController = new UserRegistryLoadingController();
+      UserRegistryLoadingController userRegistryLoadingController = new UserRegistryLoadingController();
       UserRegistry userRegistry = userRegistryLoadingController.initializeUserRegistry();
       ProjectRegistryLoadingController projectRegistryLoadingController = new ProjectRegistryLoadingController(uniqueIdService);
-      ProjectRegistry projectRegistry = projectRegistryLoadingController.initializeProjectRegistry();*/
+      ProjectRegistry projectRegistry = projectRegistryLoadingController.initializeProjectRegistry();
+      ProjectStaffLinker projectStaffLinker = new ProjectStaffLinker(projectRegistry, userRegistry);
+      projectStaffLinker.linkProjectToOfficer();
+      projectStaffLinker.linkProjectToManager();
+      //exit(0);
 
       // Load UserRegistry and ProjectRegistry from dat
-      UserRegistry userRegistry = UserRegistry.load();
-      ProjectRegistry projectRegistry = ProjectRegistry.load();
+//      UserRegistry userRegistry = UserRegistry.load();
+//      ProjectRegistry projectRegistry = ProjectRegistry.load();
 
       //clear mememory
-//      UserRegistry userRegistry = new UserRegistry();
-//      userRegistry.clearFromFile();
-//      ProjectRegistry projectRegistry = new ProjectRegistry();
-//      projectRegistry.save();
-//      exit(0);//
+      /*UserRegistry userRegistry = new UserRegistry();
+      userRegistry.clearFromFile();
+      ProjectRegistry projectRegistry = new ProjectRegistry();
+      projectRegistry.save();
+      exit(0);*/
 
-      AuthenticationService authService = new AuthenticationService(userRegistry);
+      AuthenticationService authService = new AuthenticationService(userRegistry); // TODO: Pass the validation service
       SessionManager sessionManager = new SessionManager(authService);
-      ProjectService projectService = new ProjectService(projectRegistry, uniqueIdService);
+      IProjectService projectService = new ProjectService(projectRegistry, uniqueIdService);
 
 
       // Create login menu
@@ -63,16 +71,20 @@ public class EntryPoint {
 
             Object user = sessionManager.getCurrentUser();
 
+            IUserService userService = new UserService(passwordValidationService, (User) user);
+
             if (user instanceof Manager) {
                IManagerService managerService = new ManagerService(projectService, (Manager) user);
-               ManagerController managerController = new ManagerController(managerService, projectService);
+               ManagerController managerController = new ManagerController(managerService, projectService);// TODO: Pass the validation service
                currentMenu = new ManagerMenu(scanner, sessionManager, managerController);
             }
             else if (user instanceof Officer) {
-               // currentMenu = new OfficerMenu(scanner, sessionManager, officerController);
+               IOfficerService officerService = new OfficerService(projectService, uniqueIdService, (Officer) user, userService);
+               OfficerController officerController = new OfficerController(officerService, projectService);
+               currentMenu = new OfficerMenu(scanner, sessionManager, officerController);
             }
             else if (user instanceof Applicant) {
-               // currentMenu = new ApplicantMenu(scanner, sessionManager, applicantController);
+               // currentMenu = new ApplicantMenu(scanner, sessionManager, applicantController); // TODO: Pass the validation service
             }
             else {
                Color.println("Unsupported user type. Logging out.", Color.RED);
@@ -87,16 +99,16 @@ public class EntryPoint {
          currentMenu.handleInput();
 
          // Check if user wants to exit
-         if (!running) {
-            Color.println("\nEnter 'exit' to quit or any key to continue:", Color.BLUE);
+         if (sessionManager.getCurrentUser() == null) {
+            Color.print("\n\nEnter 'exit' to quit or any key to continue:", Color.BLUE);
             String input = scanner.nextLine();
             if ("exit".equalsIgnoreCase(input)) {
                running = false;
             }
          }
       }
-
       Color.println("Thank you for using the BTO Housing Application System. Goodbye!", Color.CYAN);
       scanner.close();
    }
 }
+

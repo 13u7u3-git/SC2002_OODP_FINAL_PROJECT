@@ -1,7 +1,7 @@
 package interfaces;
 
 public interface Menu {
-    void display();
+   void display();
 
-    void handleInput();
+   void handleInput();
 }

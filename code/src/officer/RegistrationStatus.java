@@ -1,6 +1,6 @@
 package officer;
 
-public enum OfficerRegistrationStatus {
+public enum RegistrationStatus {
    PENDING,
    APPROVED,
    REJECTED

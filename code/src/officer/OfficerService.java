@@ -1,66 +1,80 @@
-//package officer;
-//
-//import java.util.List;
-//import applicant.Application;
-//import applicant.ApplicationStatus;
-//import project.FlatType;
-//import project.Project;
-//import officer.RegistrationForm;
-//import applicant.ApplicantService;
-//
-//public class OfficerService {
-//    private static OfficerService instance = null;
-//    private ApplicantService applicantService = ApplicantService.getInstance();
-//
-//    private OfficerService() {
-//        // TODO Private constructor for singleton pattern
-//    }
-//
-//    public static OfficerService getInstance() {
-//        if (instance == null) {
-//            instance = new OfficerService();
-//        }
-//        return instance;
-//    }
-//
-//    public RegistrationForm createRegistrationForm(Project project, Officer officer) {
-//        return new RegistrationForm(project, officer);
-//    }
-//
-//    public Boolean sendRegistrationRequest(RegistrationForm registrationForm) {
-//        // TODO Implementation to send registration request
-//        return true;
-//    }
-//
-//    public void viewRegistrationStatus(RegistrationForm registrationForm) {
-//        // TODO Implementation to view registration status
-//    }
-//
-//    public void updateFlatAvailability(Project project, FlatType flatType, int count) {
-//        // TODO Implementation to update flat availability
-//    }
-//
-//    public void processFlatBooking(Application application) {
-//        // TODO Implementation to process flat booking
-//    }
-//
-//    public void retrieveApplicantsDetails(Application application) {
-//        // TODO Implementation to retrieve applicant details
-//    }
-//
-//    public void updateApplicationStatus(Application application, ApplicationStatus status) {
-//        applicantService.setApplicationStatus(application, status);
-//    }
-//
-//    public void updateApplicantProfile(FlatType flatType) {
-//        // TODO Implementation to update applicant profile
-//    }
-//
-//    public void generateReceipt(Application application) {
-//        // TODO Implementation to generate receipt
-//    }
-//
-//    public void viewAllProjects() {
-//        // TODO Implementation to view all projects
-//    }
-//}
+package officer;
+
+import UniqueID.IUniqueIdService;
+import UniqueID.IdType;
+import enquiry.Enquiry;
+import interfaces.StaffService;
+import project.IProjectService;
+import project.Project;
+import user.IUserService;
+
+import java.util.List;
+
+public class OfficerService implements IOfficerService, StaffService {
+   private final IProjectService projectService;
+   private final IUniqueIdService uniqueIdService;
+   private final Officer officer;
+   private final IUserService userService;
+
+   public OfficerService(IProjectService projectService, IUniqueIdService uniqueIdService, Officer officer, IUserService userService) {
+      this.projectService = projectService;
+      this.uniqueIdService = uniqueIdService;
+      this.officer = officer;
+      this.userService = userService;
+   }
+
+   @Override
+   public List<Enquiry> getCurrentProjectEnquiries() {
+      return List.of();
+   }
+
+   @Override
+   public RegistrationForm createRegistrationForm(String projectName) {
+      return new RegistrationForm(uniqueIdService.generateUniqueId(IdType.REGISTRATION_FORM_ID), officer.getName(), officer.getNric(), projectService.getProjectByName(projectName).getId(), projectName);
+   }
+
+   @Override
+   public void sendRegistrationRequest(RegistrationForm form) throws IllegalArgumentException {
+      projectService.addRegistrationToProject(form);
+   }
+
+   @Override
+   public OfficerStatus getOfficerStatus() {
+      return officer.getOfficerStatus();
+   }
+
+   @Override
+   public void setOfficerStatus(OfficerStatus status) {
+      officer.setOfficerStatus(status);
+   }
+
+   @Override
+   public RegistrationForm getCurrentRegistrationForm() {
+      return officer.getCurrentRegistrationForm();
+   }
+
+   @Override
+   public void setCurrentRegistrationForm(RegistrationForm form) {
+      officer.setCurrentRegistrationForm(form);
+   }
+
+   @Override
+   public void addToMyRegistrations(RegistrationForm form) {
+      officer.addRegistrationForm(form);
+   }
+
+   @Override
+   public void removeRegistrationForm(RegistrationForm form) {
+      officer.removeRegistrationForm(form);
+   }
+
+   @Override
+   public Project getCurrentProject(Officer officer) {
+      return null;
+   }
+
+   @Override
+   public void changePassword(String oldPassword, String newPassword, String confirmPassword) {
+      userService.changePassword(oldPassword, newPassword, confirmPassword);
+   }
+}

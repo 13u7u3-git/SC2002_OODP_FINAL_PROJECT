@@ -3,19 +3,18 @@ package manager;
 import enquiry.Enquiry;
 import interfaces.StaffService;
 import project.FlatType;
-import project.ImmutableProjectView;
+import project.IProjectService;
 import project.Project;
-import project.ProjectService;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 public class ManagerService implements IManagerService, StaffService {
-   private final ProjectService projectService;
+   private final IProjectService projectService;
    private final Manager manager;
 
-   public ManagerService(ProjectService projectService, Manager manager) {
+   public ManagerService(IProjectService projectService, Manager manager) {
       this.projectService = projectService;
       this.manager = manager;
    }
@@ -25,11 +24,6 @@ public class ManagerService implements IManagerService, StaffService {
       this.manager.setCurrentProject(currentProject);
    }
 
-   @Override
-   public ImmutableProjectView getCurrentProjectDetails() {
-      //return immutable version of the current project
-      return new ImmutableProjectView(this.manager.getCurrentProject());
-   }//not in this format , to string format is better
 
    @Override
    public List<Enquiry> getCurrentProjectEnquiries() {

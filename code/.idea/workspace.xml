@@ -36,30 +36,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.BTOmain.executor": "Run",
-    "Application.Main.executor": "Run",
-    "Application.UniqueId.executor": "Run",
-    "Application.UserRegistryLoader.executor": "Run",
-    "RunOnceActivity.ChatTagsLlmMigration": "true",
-    "RunOnceActivity.CodyAccountHistoryMigration": "true",
-    "RunOnceActivity.CodyAccountsIdsRefresh": "true",
-    "RunOnceActivity.CodyAssignOrphanedChatsToActiveAccount": "true",
-    "RunOnceActivity.CodyConvertUrlToCodebaseName": "true",
-    "RunOnceActivity.CodyHistoryLlmMigration": "true",
-    "RunOnceActivity.CodyMigrateChatHistory-v2": "true",
-    "RunOnceActivity.CodyProjectSettingsMigration": "true",
-    "RunOnceActivity.DeprecatedChatLlmMigration": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.ToggleCodyToolWindowAfterMigration": "true",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "D:/GitHub/Y2S2-collab/[2002]/SC2002_OODP_FINAL_PROJECT/code/given",
-    "onboarding.tips.debug.path": "D:/GitHub/Y2S2-collab/SC2002/SC2002_OODP_FINAL_PROJECT/code/src/Main.java",
-    "rearrange.code.on.save": "true",
-    "settings.editor.selected.configurable": "preferences.lookFeel"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.BTOmain.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.UniqueId.executor&quot;: &quot;Run&quot;,
+    &quot;Application.UserRegistryLoader.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ChatTagsLlmMigration&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.CodyAccountHistoryMigration&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.CodyAccountsIdsRefresh&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.CodyAssignOrphanedChatsToActiveAccount&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.CodyConvertUrlToCodebaseName&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.CodyHistoryLlmMigration&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.CodyMigrateChatHistory-v2&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.CodyProjectSettingsMigration&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.DeprecatedChatLlmMigration&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ToggleCodyToolWindowAfterMigration&quot;: &quot;true&quot;,
+    &quot;ToolWindow.Run.ShowToolbar&quot;: &quot;false&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/GitHub/Y2S2-collab/[2002]/SC2002_OODP_FINAL_PROJECT/code/given&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;D:/GitHub/Y2S2-collab/SC2002/SC2002_OODP_FINAL_PROJECT/code/src/Main.java&quot;,
+    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.sourcegraph.cody.config.ui.CodyConfigurable&quot;,
+    &quot;settings.editor.splitter.proportion&quot;: &quot;0.28409094&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="officer" />
@@ -75,6 +78,9 @@
       <recent name="D:\GitHub\Y2S2-collab\SC2002\SC2002_OODP_FINAL_PROJECT\code\src\system" />
       <recent name="D:\GitHub\Y2S2-collab\SC2002\SC2002_OODP_FINAL_PROJECT\code\src\yd_srcs\src\service" />
       <recent name="D:\GitHub\Y2S2-collab\SC2002\SC2002_OODP_FINAL_PROJECT\code\src\officer" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="project" />
     </key>
   </component>
   <component name="RunManager" selected="Application.BTOmain">
@@ -129,5 +135,15 @@
       <updated>1744778795409</updated>
     </task>
     <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.RuntimeException" package="java.lang" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

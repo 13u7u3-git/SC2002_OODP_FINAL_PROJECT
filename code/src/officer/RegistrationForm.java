@@ -1,54 +1,54 @@
 package officer;
 
-import project.Project;
-
 import java.time.LocalDate;
 
 public class RegistrationForm {
    private final int id;
-   private final Officer officer;
-   private final Project project;
+   private final String officer;
+   private final String nric;
+   private final Integer projectId;
+   private final String projectName;
    private final LocalDate dateApplied;
-   private OfficerRegistrationStatus registrationStatus;
 
-   public RegistrationForm(int id, Officer officer, Project project) {
+   public RegistrationForm(int id, String officer, String nric, Integer projectId, String projectName) {
       this.id = id;
       this.officer = officer;
-      this.project = project;
-      this.registrationStatus = OfficerRegistrationStatus.PENDING;
+      this.nric = nric;
+      this.projectId = projectId;
+      this.projectName = projectName;
       this.dateApplied = LocalDate.now();
-   }
-
-   // to load data for data persistence.
-   public RegistrationForm(int id, Officer officer, Project project, OfficerRegistrationStatus registrationStatus, LocalDate dateApplied) {
-      this.id = id;
-      this.officer = officer;
-      this.project = project;
-      this.registrationStatus = registrationStatus;
-      this.dateApplied = dateApplied;
    }
 
    public int getId() {
       return id;
    }
 
-   public Officer getOfficer() {
+   public String getOfficer() {
       return officer;
    }
 
-   public Project getProject() {
-      return project;
-   }
-
-   public OfficerRegistrationStatus getRegistrationStatus() {
-      return registrationStatus;
-   }
-
-   public void setRegistrationStatus(OfficerRegistrationStatus registrationStatus) {
-      this.registrationStatus = registrationStatus;
+   public Integer getProjectId() {
+      return projectId;
    }
 
    public LocalDate getDateApplied() {
       return dateApplied;
    }
+
+   public String getNric() {
+      return nric;
+   }
+
+   @Override
+   public String toString() {
+      return "============== Registration Form ==============\n" +
+              "Registration ID     : " + id + "\n" +
+              "Officer             : " + officer + "\n" +
+              "NRIC                : " + nric + "\n" +
+              "Project ID          : " + projectId + "\n" +
+              "Project Name        : " + projectName + "\n" +
+              "Date Applied        : " + dateApplied + "\n" +
+              "==============================================";
+   }
+
 }

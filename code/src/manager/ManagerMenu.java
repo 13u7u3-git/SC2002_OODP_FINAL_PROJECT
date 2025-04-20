@@ -23,7 +23,6 @@ public class ManagerMenu implements Menu {
 
    @Override
    public void display() {
-      Color.println("Welcome Back (Manager) : " + sessionManager.getCurrentUser().getName() + "!", Color.YELLOW);
       Color.print("========== HDB Manager Menu ==========\n" +
               "1. Create New BTO Project\n" +
               "2. Edit Existing BTO Project\n" +
@@ -43,7 +42,6 @@ public class ManagerMenu implements Menu {
               "0. Logout\n" +
               "======================================\n" +
               "Please enter your choice:", Color.CYAN);
-
    }
 
    @Override
@@ -136,15 +134,14 @@ public class ManagerMenu implements Menu {
          Color.print("Enter Number of Officer Slots Available:", Color.GREEN);
          int officerSlots = Integer.parseInt(scanner.nextLine());
 
-
-         if (managerController.createProject(name, neighbourhood, twoRoomFlatCount, twoRoomPrice, threeRoomFlatCount, threeRoomPrice,
-                 applicationOpeningDate, applicationClosingDate, sessionManager.getCurrentUser().getName(), officerSlots, new ArrayList<>())) {
+         try {
+            managerController.createProject(name, neighbourhood, twoRoomFlatCount, twoRoomPrice, threeRoomFlatCount, threeRoomPrice,
+                    applicationOpeningDate, applicationClosingDate, sessionManager.getCurrentUser().getName(), officerSlots, new ArrayList<>());
             Color.println("Project created successfully!", Color.GREEN);
          }
-         else {
-            Color.println("Project creation failed!", Color.RED);
+         catch (IllegalArgumentException e) {
+            Color.println("Project Creation Failed, An error occurred: " + e.getMessage(), Color.RED);
          }
-
       }
       catch (NumberFormatException e) {
          Color.println("Invalid number format. Please try again.", Color.RED);
@@ -153,7 +150,7 @@ public class ManagerMenu implements Menu {
          Color.println("Invalid date format. Please use yyyy-MM-dd format.", Color.RED);
       }
       catch (Exception e) {
-         Color.println("An error occurred: " + e.getMessage(), Color.RED);
+         Color.println("Project Creation Failed. An error occurred." + e.getMessage(), Color.RED);
       }
    }
 

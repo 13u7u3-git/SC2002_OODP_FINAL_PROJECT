@@ -1,13 +1,12 @@
 package interfaces;
 
 import enquiry.Enquiry;
-import project.ImmutableProjectView;
 
 import java.util.List;
 
 public interface StaffService {
    // View details of a project
-   ImmutableProjectView getCurrentProjectDetails();
+   //ImmutableProjectView getCurrentProjectDetails();
 
    // View enquiries related to a project
    List<Enquiry> getCurrentProjectEnquiries();

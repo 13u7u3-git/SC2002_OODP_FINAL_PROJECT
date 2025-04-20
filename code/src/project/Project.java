@@ -27,20 +27,20 @@ public class Project implements Serializable {
 
    // =================== Mutable Project Metadata ===================
    private String projectName;
-   private String neighbourhood;
+   private String neighborhood;
    private LocalDate applicationOpeningDate;
    private LocalDate applicationClosingDate;
    private boolean visibility = false;
    private Integer availableOfficerSlots;
 
    // Use this when Manager wants to create a new project
-   public Project(int id, String projectName, String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
+   public Project(int id, String projectName, String neighborhood, Integer twoRoomUnits, Double twoRoomPrice,
                   Integer threeRoomUnits, Double threeRoomPrice, LocalDate applicationOpeningDate,
                   LocalDate applicationClosingDate, String manager, Integer availableOfficerSlots,
                   List<String> officers) {
       this.id = id;
       this.projectName = projectName;
-      this.neighbourhood = neighbourhood;
+      this.neighborhood = neighborhood;
       this.flatPrices = Map.of(FlatType.TWO_ROOM, twoRoomPrice, FlatType.THREE_ROOM, threeRoomPrice);
       this.availableFlats = Map.of(FlatType.TWO_ROOM, twoRoomUnits, FlatType.THREE_ROOM, threeRoomUnits);
       this.remainingFlats = Map.of(FlatType.TWO_ROOM, twoRoomUnits, FlatType.THREE_ROOM, threeRoomUnits);
@@ -80,6 +80,14 @@ public class Project implements Serializable {
       return registrationForms;
    }
 
+   public void addRegistrationForm(RegistrationForm registrationForm) {
+      registrationForms.add(registrationForm);
+   }
+
+   public void removeRegistrationForm(RegistrationForm registrationForm) {
+      registrationForms.remove(registrationForm);
+   }
+
    public List<Application> getApplications() {
       return applications;
    }
@@ -96,12 +104,12 @@ public class Project implements Serializable {
       this.projectName = projectName;
    }
 
-   public String getNeighbourhood() {
-      return neighbourhood;
+   public String getNeighborhood() {
+      return neighborhood;
    }
 
-   public void setNeighbourhood(String neighbourhood) {
-      this.neighbourhood = neighbourhood;
+   public void setNeighborhood(String neighborhood) {
+      this.neighborhood = neighborhood;
    }
 
    public LocalDate getApplicationOpeningDate() {
@@ -135,6 +143,23 @@ public class Project implements Serializable {
    public void setAvailableOfficerSlots(Integer availableOfficerSlots) {
       this.availableOfficerSlots = availableOfficerSlots;
    }
+
+   public Integer getTwoRoomUnits() {
+      return availableFlats.get(FlatType.TWO_ROOM);
+   }
+
+   public Double getTwoRoomPrice() {
+      return flatPrices.get(FlatType.TWO_ROOM);
+   }
+
+   public Integer getThreeRoomUnits() {
+      return availableFlats.get(FlatType.THREE_ROOM);
+   }
+
+   public Double getThreeRoomPrice() {
+      return flatPrices.get(FlatType.THREE_ROOM);
+   }
+
 // =================== Mutable Project Metadata ===================
 }
 
