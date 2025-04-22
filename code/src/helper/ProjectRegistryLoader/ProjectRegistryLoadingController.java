@@ -14,7 +14,6 @@ public class ProjectRegistryLoadingController {
 
    private final ProjectRegistry projectRegistry;
    private final ProjectRegistryLoaderService loaderService;
-   private final String projectFilePath = "./given/ProjectList.txt";
 
    /**
     * Constructs a ProjectRegistryLoadingController.
@@ -29,6 +28,7 @@ public class ProjectRegistryLoadingController {
       System.out.println("Starting project registry initialization...");
       try {
          // Use the loader service to load data from the file into the registry
+         String projectFilePath = "./given/ProjectList.txt";
          loaderService.loadRegistry(projectFilePath);
          System.out.println("Project registry initialization complete.");
          return this.projectRegistry; // Return the populated registry

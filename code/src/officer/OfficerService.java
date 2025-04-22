@@ -6,21 +6,66 @@ import enquiry.Enquiry;
 import interfaces.StaffService;
 import project.IProjectService;
 import project.Project;
-import user.IUserService;
+import system.ServiceRegistry;
+import user.IPasswordValidationService;
+import user.User;
+import user.UserRegistry;
 
 import java.util.List;
 
 public class OfficerService implements IOfficerService, StaffService {
    private final IProjectService projectService;
    private final IUniqueIdService uniqueIdService;
-   private final Officer officer;
-   private final IUserService userService;
+   private final IPasswordValidationService passwordValidationService;
+   private Officer officer;
 
-   public OfficerService(IProjectService projectService, IUniqueIdService uniqueIdService, Officer officer, IUserService userService) {
-      this.projectService = projectService;
-      this.uniqueIdService = uniqueIdService;
-      this.officer = officer;
-      this.userService = userService;
+   public OfficerService() {
+
+      this.projectService = ServiceRegistry.get(IProjectService.class);
+      this.uniqueIdService = ServiceRegistry.get(IUniqueIdService.class);
+      this.passwordValidationService = ServiceRegistry.get(IPasswordValidationService.class);
+   }
+
+   private void atLogin() {
+      // Check if officer object is initialized
+      if (officer == null) {
+         System.out.println("Error: Officer not initialized");
+         return;
+      }
+
+      Project currentProject = officer.getCurrentProject();
+      RegistrationForm currentRegistrationForm = getCurrentRegistrationForm();
+
+      if (currentProject != null) {
+         //System.outprintln("Restoring officer status to ACTIVE");
+         setOfficerStatus(OfficerStatus.ACTIVE);
+         return;
+      }
+
+      if (currentRegistrationForm == null) {
+         System.out.println("No pending registration forms found");
+         return; // don't do anything
+      }
+
+      if (getOfficerStatus() == OfficerStatus.PENDING && !currentRegistrationForm.isPending()) {
+         // simulating active listener
+         if (currentRegistrationForm.isApproved()) {
+            //System.outprintln("Registration form approved. Setting status to ACTIVE");
+            setOfficerStatus(OfficerStatus.ACTIVE);
+            Project project = projectService.getProjectById(currentRegistrationForm.getProjectId());
+            if (project != null) {
+               officer.setCurrentProject(project);
+               //System.outprintln("Assigned to project: " + project.getProjectName());
+            }
+            else {
+               System.out.println("Warning: Approved project not found");
+            }
+         }
+         else {
+            //System.outprintln("Registration form rejected. Setting status to INACTIVE");
+            setOfficerStatus(OfficerStatus.INACTIVE);
+         }
+      }
    }
 
    @Override
@@ -40,6 +85,7 @@ public class OfficerService implements IOfficerService, StaffService {
 
    @Override
    public OfficerStatus getOfficerStatus() {
+      //System.out.println("Officer status: " + officer.getOfficerStatus());
       return officer.getOfficerStatus();
    }
 
@@ -69,12 +115,30 @@ public class OfficerService implements IOfficerService, StaffService {
    }
 
    @Override
-   public Project getCurrentProject(Officer officer) {
-      return null;
+   public Project getCurrentProject() {
+      return officer.getCurrentProject();
    }
 
    @Override
-   public void changePassword(String oldPassword, String newPassword, String confirmPassword) {
-      userService.changePassword(oldPassword, newPassword, confirmPassword);
+   public User getUser() {
+      return this.officer;
+   }
+
+   @Override
+   public void setUser(Officer officer) {
+      this.officer = officer;
+      this.atLogin();
+   }
+
+   @Override
+   public void setOfficerCurrentProject(String officerName, Project currentProject) {
+      UserRegistry userRegistry = ServiceRegistry.get(UserRegistry.class);
+      Officer officer = (Officer) userRegistry.getUser(officerName);
+      officer.setCurrentProject(currentProject);
+   }
+
+   @Override
+   public IPasswordValidationService getPasswordValidationService() {
+      return this.passwordValidationService;
    }
 }

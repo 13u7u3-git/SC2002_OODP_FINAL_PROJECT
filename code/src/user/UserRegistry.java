@@ -36,11 +36,11 @@ public class UserRegistry implements Serializable {
     *
     * @return A new UserRegistry instance loaded from the file, or a new empty instance if loading fails.
     */
-   public static UserRegistry load() {
+   public UserRegistry load() {
       try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
          Object obj = ois.readObject();
          if (obj instanceof UserRegistry) {
-            System.out.println("UserRegistry loaded successfully from " + filePath + "." + ((UserRegistry) obj).getUsers().size());
+            System.out.println("UserRegistry loaded successfully from " + filePath + ".::::" + ((UserRegistry) obj).getUsers().size());
             return (UserRegistry) obj;
          }
       }

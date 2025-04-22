@@ -1,34 +1,42 @@
 package officer;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
-public class RegistrationForm {
-   private final int id;
-   private final String officer;
+public class RegistrationForm implements Serializable {
+   private final Integer id;
+   private final String officerName;
    private final String nric;
    private final Integer projectId;
    private final String projectName;
    private final LocalDate dateApplied;
+   private RegistrationStatus status;
 
-   public RegistrationForm(int id, String officer, String nric, Integer projectId, String projectName) {
+   public RegistrationForm(Integer id, String officerName, String nric, Integer projectId, String projectName) {
       this.id = id;
-      this.officer = officer;
+      this.officerName = officerName;
       this.nric = nric;
       this.projectId = projectId;
       this.projectName = projectName;
       this.dateApplied = LocalDate.now();
+      this.status = RegistrationStatus.PENDING;
    }
 
-   public int getId() {
+   public Integer getId() {
       return id;
    }
 
-   public String getOfficer() {
-      return officer;
+   public String getOfficerName() {
+      return officerName;
    }
 
    public Integer getProjectId() {
       return projectId;
+   }
+
+   public String getProjectName() {
+      return projectName;
    }
 
    public LocalDate getDateApplied() {
@@ -39,16 +47,36 @@ public class RegistrationForm {
       return nric;
    }
 
+   public RegistrationStatus getStatus() {
+      return status;
+   }
+
+   public void setStatus(RegistrationStatus status) {
+      this.status = status;
+   }
+
+   public Boolean isPending() {
+      return status == RegistrationStatus.PENDING;
+   }
+
+   public Boolean isApproved() {
+      return status == RegistrationStatus.APPROVED;
+   }
+
    @Override
    public String toString() {
       return "============== Registration Form ==============\n" +
               "Registration ID     : " + id + "\n" +
-              "Officer             : " + officer + "\n" +
+              "Officer             : " + officerName + "\n" +
               "NRIC                : " + nric + "\n" +
               "Project ID          : " + projectId + "\n" +
               "Project Name        : " + projectName + "\n" +
               "Date Applied        : " + dateApplied + "\n" +
+              "Status              : " + status + "\n" +
               "==============================================";
    }
 
+   public List<String> toStringAsList() {
+      return List.of(id.toString(), officerName, nric, dateApplied.toString(), status.toString(), projectId.toString(), projectName);
+   }
 }

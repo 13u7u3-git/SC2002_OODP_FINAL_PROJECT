@@ -5,6 +5,7 @@ import UniqueID.IdType;
 import officer.IRegistrationValidationService;
 import officer.RegistrationForm;
 import officer.RegistrationValidationService;
+import system.ServiceRegistry;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,9 +17,9 @@ public class ProjectService implements IProjectService {
    private final IProjectValidationService projectValidationService;
    private final IRegistrationValidationService registrationValidationService;
 
-   public ProjectService(ProjectRegistry projectRegistry, IUniqueIdService uniqueIdService) {
+   public ProjectService(ProjectRegistry projectRegistry) {
       this.projectRegistry = projectRegistry;
-      this.uniqueIdService = uniqueIdService;
+      this.uniqueIdService = ServiceRegistry.get(IUniqueIdService.class);
       this.projectValidationService = new ProjectValidationService();
       this.registrationValidationService = new RegistrationValidationService(projectRegistry);
    }

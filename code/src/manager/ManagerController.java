@@ -1,20 +1,22 @@
 package manager;
 
-import helper.Color;
-import helper.TablePrinter;
+import officer.RegistrationForm;
+import officer.RegistrationStatus;
 import project.IProjectService;
 import project.Project;
+import system.ServiceRegistry;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ManagerController {
    private final IManagerService managerService;
    private final IProjectService projectService;
 
-   public ManagerController(IManagerService managerService, IProjectService projectService) {
-      this.managerService = managerService;
-      this.projectService = projectService;
+   public ManagerController() {
+      this.managerService = ServiceRegistry.get(IManagerService.class);
+      this.projectService = ServiceRegistry.get(IProjectService.class);
    }
 
    public void createProject(String projectName, String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
@@ -38,70 +40,40 @@ public class ManagerController {
       }
    }
 
-   public void viewAllProjects() {
-      Integer COLUMN_WIDTH = 15;
-      Color.println("--- All Projects ---", Color.YELLOW);
-      String[] headers = {"Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers"};
-      TablePrinter tablePrinter = new TablePrinter();
-      tablePrinter.PrintTableRow(COLUMN_WIDTH, List.of(headers));
-
+   public List<List<String>> getAllProjectsTableData() throws Exception {
       List<Project> projects = projectService.getAllProjects();
       if (projects == null || projects.isEmpty()) {
-         Color.println("No projects found.", Color.RED);
-         return;
-      }//else
-      projects.forEach(project -> {
-         String[] row = {
-                 project.getId().toString(),
-                 project.getProjectName(),
-                 project.getNeighborhood(),
-                 project.isVisibility() ? "Visible" : "Hidden",
-                 project.getTwoRoomUnits().toString(),
-                 project.getTwoRoomPrice().toString(),
-                 project.getThreeRoomUnits().toString(),
-                 project.getThreeRoomPrice().toString(),
-                 project.getApplicationOpeningDate().toString(),
-                 project.getApplicationClosingDate().toString(),
-                 project.getManager(),
-                 project.getAvailableOfficerSlots().toString(),
-                 project.getOfficers().toString()
-         };
-         tablePrinter.PrintTableRow(COLUMN_WIDTH, List.of(row));
-      });
-
+         return null;
+      }
+      else {
+         List<String> headerRow = List.of("Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers");
+         List<List<String>> tableData = new ArrayList<>();
+         tableData.add(headerRow);
+         for (Project p : projects) {
+            List<String> fromEachProject = p.toStringAsList();
+            tableData.add(fromEachProject);
+         }
+         return tableData;
+      }
    }
 
-   public void viewMyProjects() {
-      Integer COLUMN_WIDTH = 15;
-      Color.println("--- My Projects ---", Color.YELLOW);
-      String[] headers = {"Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers"};
-      TablePrinter tablePrinter = new TablePrinter();
-      tablePrinter.PrintTableRow(COLUMN_WIDTH, List.of(headers));
+   public List<List<String>> getMyProjectsTableData() {
+
       List<Project> myProjects = managerService.getMyProjects();
 
       if (myProjects == null || myProjects.isEmpty()) {
-         Color.println("No projects found.", Color.RED);
-         return;
-      }//else
-
-      myProjects.forEach(project -> {
-         String[] row = {
-                 project.getId().toString(),
-                 project.getProjectName(),
-                 project.getNeighborhood(),
-                 project.isVisibility() ? "Visible" : "Hidden",
-                 project.getTwoRoomUnits().toString(),
-                 project.getTwoRoomPrice().toString(),
-                 project.getThreeRoomUnits().toString(),
-                 project.getThreeRoomPrice().toString(),
-                 project.getApplicationOpeningDate().toString(),
-                 project.getApplicationClosingDate().toString(),
-                 project.getManager(),
-                 project.getAvailableOfficerSlots().toString(),
-                 project.getOfficers().toString()
-         };
-         tablePrinter.PrintTableRow(COLUMN_WIDTH, List.of(row));
-      });
+         return null;
+      }
+      else {
+         List<String> headerRow = List.of("Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers");
+         List<List<String>> tableData = new ArrayList<>();
+         tableData.add(headerRow);
+         for (Project p : myProjects) {
+            List<String> fromRegistration = p.toStringAsList();
+            tableData.add(fromRegistration);
+         }
+         return tableData;
+      }
    }
 
 
@@ -139,4 +111,44 @@ public class ManagerController {
       }
    }
 
+   public List<List<String>> getPendingRegistrationTableData() throws Exception {
+
+      try {
+         List<RegistrationForm> pendingRegistrations = managerService.getPendingOfficerRegistrations();
+         if (pendingRegistrations.isEmpty()) {
+            return null;
+         }
+         List<String> headerRow = List.of("ID", "Officer", "NRIC", "Date Applied", "Status", "Project ID", "Project Name");
+         List<List<String>> tableData = new ArrayList<>();
+         tableData.add(headerRow.subList(0, 4));
+         for (RegistrationForm form : pendingRegistrations) {
+            List<String> fromRegistration = form.toStringAsList().subList(0, 4);
+            tableData.add(fromRegistration);
+         }
+         return tableData;
+      }
+      catch (Exception e) {
+         throw new Exception("No pending registrations found");
+      }
+   }
+
+   public Boolean processOfficerRegistration(String identifier, RegistrationStatus status) throws Exception {
+      try {
+
+         String officerStr = managerService.setRegistrationStatus(identifier, status);
+         if (officerStr != null) {
+            managerService.addToOfficersList(officerStr);
+
+            return true;
+         }
+      }
+      catch (Exception e) {
+         throw e;
+      }
+      return false;
+   }
+
+   public String getCurrentProjectData() {
+      return managerService.getCurrentProject() != null ? managerService.getCurrentProject().toString() : null;
+   }
 }

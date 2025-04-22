@@ -3,8 +3,9 @@ package UniqueID;
 public class UniqueIdService implements IUniqueIdService {
    private final UniqueId uniqueId;
 
-   public UniqueIdService(UniqueId uniqueId) {
-      this.uniqueId = uniqueId;
+   public UniqueIdService() {
+      this.uniqueId = new UniqueId();
+      uniqueId.loadFromPropertiesFile();
    }
 
    @Override

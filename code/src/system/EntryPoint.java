@@ -1,59 +1,39 @@
 package system;
 
 import UniqueID.IUniqueIdService;
-import UniqueID.UniqueId;
 import UniqueID.UniqueIdService;
-import applicant.Applicant;
+import applicant.*;
 import helper.Color;
-import helper.ProjectRegistryLoader.ProjectRegistryLoadingController;
-import helper.ProjectRegistryLoader.ProjectStaffLinker;
-import helper.UserRegistryLoader.UserRegistryLoadingController;
+import helper.TablePrinter;
 import interfaces.Menu;
 import manager.*;
 import officer.*;
 import project.IProjectService;
 import project.ProjectRegistry;
 import project.ProjectService;
-import user.*;
+import user.IPasswordValidationService;
+import user.PasswordValidationService;
 
 import java.util.Scanner;
 
 public class EntryPoint {
    public void start() throws Exception {
       boolean running = true; // Flag to control the main loop
-// Initialize services with proper dependencies
-      UniqueId uniqueId = new UniqueId();
-      uniqueId.loadFromPropertiesFile();
-      IUniqueIdService uniqueIdService = new UniqueIdService(uniqueId);
-      IPasswordValidationService passwordValidationService = new PasswordValidationService();
-      // Initialize system components with proper dependency injection
       Scanner scanner = new Scanner(System.in);
+      TablePrinter tablePrinter = new TablePrinter();
+      Boolean loadFromTxt = true;
 
-      // Initialize UserRegistry and ProjectRegistry from Text Files (Only once)
-      UserRegistryLoadingController userRegistryLoadingController = new UserRegistryLoadingController();
-      UserRegistry userRegistry = userRegistryLoadingController.initializeUserRegistry();
-      ProjectRegistryLoadingController projectRegistryLoadingController = new ProjectRegistryLoadingController(uniqueIdService);
-      ProjectRegistry projectRegistry = projectRegistryLoadingController.initializeProjectRegistry();
-      ProjectStaffLinker projectStaffLinker = new ProjectStaffLinker(projectRegistry, userRegistry);
-      projectStaffLinker.linkProjectToOfficer();
-      projectStaffLinker.linkProjectToManager();
-      //exit(0);
+      // Initialize and register all services to ServiceRegistry
+      initializeServices(loadFromTxt); // written in the initializeServices method below, to prevent DI boilerplate
 
-      // Load UserRegistry and ProjectRegistry from dat
-//      UserRegistry userRegistry = UserRegistry.load();
-//      ProjectRegistry projectRegistry = ProjectRegistry.load();
-
-      //clear mememory
-      /*UserRegistry userRegistry = new UserRegistry();
-      userRegistry.clearFromFile();
-      ProjectRegistry projectRegistry = new ProjectRegistry();
-      projectRegistry.save();
-      exit(0);*/
-
-      AuthenticationService authService = new AuthenticationService(userRegistry); // TODO: Pass the validation service
-      SessionManager sessionManager = new SessionManager(authService);
-      IProjectService projectService = new ProjectService(projectRegistry, uniqueIdService);
-
+      // Get required services from registry
+      SessionManager sessionManager = ServiceRegistry.get(SessionManager.class);
+      IApplicantService applicantService = ServiceRegistry.get(IApplicantService.class);
+      IOfficerService officerService = ServiceRegistry.get(IOfficerService.class);
+      IManagerService managerService = ServiceRegistry.get(IManagerService.class);
+      OfficerController officerController = ServiceRegistry.get(OfficerController.class);
+      ManagerController managerController = ServiceRegistry.get(ManagerController.class);
+      ApplicantController applicantController = ServiceRegistry.get(ApplicantController.class);
 
       // Create login menu
       LoginMenu loginMenu = new LoginMenu(sessionManager, scanner);
@@ -68,35 +48,29 @@ public class EntryPoint {
             currentMenu = loginMenu;
          }
          else {
-
             Object user = sessionManager.getCurrentUser();
 
-            IUserService userService = new UserService(passwordValidationService, (User) user);
-
             if (user instanceof Manager) {
-               IManagerService managerService = new ManagerService(projectService, (Manager) user);
-               ManagerController managerController = new ManagerController(managerService, projectService);// TODO: Pass the validation service
-               currentMenu = new ManagerMenu(scanner, sessionManager, managerController);
+               managerService.setUser((Manager) user);
+               currentMenu = new ManagerMenu(scanner, tablePrinter, sessionManager, managerController);
             }
             else if (user instanceof Officer) {
-               IOfficerService officerService = new OfficerService(projectService, uniqueIdService, (Officer) user, userService);
-               OfficerController officerController = new OfficerController(officerService, projectService);
-               currentMenu = new OfficerMenu(scanner, sessionManager, officerController);
+               officerService.setUser((Officer) user);
+               currentMenu = new OfficerMenu(scanner, tablePrinter, sessionManager, officerController);
             }
             else if (user instanceof Applicant) {
-               // currentMenu = new ApplicantMenu(scanner, sessionManager, applicantController); // TODO: Pass the validation service
+               applicantService.setUser((Applicant) user);
+               currentMenu = new ApplicantMenu(scanner, tablePrinter, sessionManager, applicantController);
             }
             else {
                Color.println("Unsupported user type. Logging out.", Color.RED);
                sessionManager.logout();
                currentMenu = loginMenu;
             }
-
          }
 
          // Display and handle the current menu
-         currentMenu.display();
-         currentMenu.handleInput();
+         currentMenu.run();
 
          // Check if user wants to exit
          if (sessionManager.getCurrentUser() == null) {
@@ -110,5 +84,49 @@ public class EntryPoint {
       Color.println("Thank you for using the BTO Housing Application System. Goodbye!", Color.CYAN);
       scanner.close();
    }
-}
 
+   /**
+    * Initialize all services and register them in the ServiceRegistry
+    */
+   private void initializeServices(Boolean loadFromTxt) {
+      // Create core services
+      IUniqueIdService uniqueIdService = new UniqueIdService();
+      IPasswordValidationService passwordValidationService = new PasswordValidationService();
+
+      // Register core services
+      ServiceRegistry.register(IUniqueIdService.class, uniqueIdService);
+      ServiceRegistry.register(IPasswordValidationService.class, passwordValidationService);
+
+      // Create and register session manager
+      SessionManager sessionManager = new SessionManager(loadFromTxt);
+      ServiceRegistry.register(SessionManager.class, sessionManager);
+
+      // Get project registry from session manager
+      ProjectRegistry projectRegistry = sessionManager.getProjectRegistry();
+
+      // Create and register project service
+      IProjectService projectService = new ProjectService(projectRegistry);
+      ServiceRegistry.register(IProjectService.class, projectService);
+
+      // Create and register officer service
+      IApplicantService applicantService = new ApplicantService();
+      ServiceRegistry.register(IApplicantService.class, applicantService);
+
+      IOfficerService officerService = new OfficerService();
+      ServiceRegistry.register(IOfficerService.class, officerService);
+
+      // Create and register manager service
+      IManagerService managerService = new ManagerService();
+      ServiceRegistry.register(IManagerService.class, managerService);
+
+      // Create and register controllers
+      ApplicantController applicantController = new ApplicantController();
+      ServiceRegistry.register(ApplicantController.class, applicantController);
+
+      OfficerController officerController = new OfficerController();
+      ServiceRegistry.register(OfficerController.class, officerController);
+
+      ManagerController managerController = new ManagerController();
+      ServiceRegistry.register(ManagerController.class, managerController);
+   }
+}

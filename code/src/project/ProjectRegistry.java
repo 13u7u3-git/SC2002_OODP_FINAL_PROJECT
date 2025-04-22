@@ -24,7 +24,7 @@ public class ProjectRegistry implements Serializable, Filterable<Project> {
       this.projects = projects;
    }
 
-   public static ProjectRegistry load() {
+   public ProjectRegistry load() {
       try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
          return (ProjectRegistry) ois.readObject();
       }
@@ -34,6 +34,7 @@ public class ProjectRegistry implements Serializable, Filterable<Project> {
          return new ProjectRegistry();
       }
    }
+
 
    // Only for other service classes to view and filter, cannot make any changes to the original list.
    // Cannot modify the original list structure (add/remove projects).

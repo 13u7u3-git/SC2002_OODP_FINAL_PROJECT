@@ -160,7 +160,37 @@ public class Project implements Serializable {
       return flatPrices.get(FlatType.THREE_ROOM);
    }
 
+
 // =================== Mutable Project Metadata ===================
+
+
+// =================== Printable String Project Metadata ===================
+
+   //"Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers"
+   public List<String> toStringAsList() {
+      return List.of(id.toString(), projectName, neighborhood, visibility ? "Visible" : "Hidden", getTwoRoomUnits().toString(), getTwoRoomPrice().toString(), getThreeRoomUnits().toString(), getThreeRoomPrice().toString(), applicationOpeningDate.toString(), applicationClosingDate.toString(), manager, availableOfficerSlots.toString(), officers.toString());
+   }
+
+   @Override // to print as a form like
+   public String toString() {
+      return "============== Project Details ==============\n" +
+              "Project ID          : " + id + "\n" +
+              "Project Name        : " + projectName + "\n" +
+              "Neighbourhood       : " + neighborhood + "\n" +
+              "Visibility          : " + (visibility ? "Visible" : "Hidden") + "\n" +
+              "Two Room Units      : " + getTwoRoomUnits() + "\n" +
+              "Two Room Price      : " + getTwoRoomPrice() + "\n" +
+              "Three Room Units    : " + getThreeRoomUnits() + "\n" +
+              "Three Room Price    : " + getThreeRoomPrice() + "\n" +
+              "Opening Date        : " + applicationOpeningDate + "\n" +
+              "Closing Date        : " + applicationClosingDate + "\n" +
+              "Manager             : " + manager + "\n" +
+              "Officer Slots       : " + availableOfficerSlots + "\n" +
+              "Officers            : " + officers + "\n" +
+              "==============================================";
+   }
+
+
 }
 
 

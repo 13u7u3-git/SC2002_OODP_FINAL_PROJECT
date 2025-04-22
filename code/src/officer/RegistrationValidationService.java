@@ -18,7 +18,7 @@ public class RegistrationValidationService implements IRegistrationValidationSer
               .filter(p -> p.getId().equals(form.getProjectId()))
               .findFirst()
               .orElseThrow(() -> new IllegalArgumentException("Project does not exist"));
-      validateNotAlreadyHandling(form.getOfficer(), targetProject);
+      validateNotAlreadyHandling(form.getOfficerName(), targetProject);
       validateNoExistingRegistration(form.getNric(), targetProject);
       validateOfficerSlots(targetProject);
       validateApplicationPeriod(targetProject);

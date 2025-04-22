@@ -1,8 +1,9 @@
 package officer;
 
 import project.Project;
+import user.IUserService;
 
-public interface IOfficerService {
+public interface IOfficerService extends IUserService {
    // Officer Registration
    RegistrationForm createRegistrationForm(String projectId);
 
@@ -21,14 +22,17 @@ public interface IOfficerService {
    void removeRegistrationForm(RegistrationForm form);
 
    // Project Handling
-   Project getCurrentProject(Officer officer);
+   Project getCurrentProject();
 
-   void changePassword(String oldPassword, String newPassword, String confirmPassword);
+   void setUser(Officer officer);
+
+   void setOfficerCurrentProject(String officerName, Project currentProject);
+
 
    // Application Management
 //   List<Application> getApplicationsForCurrentProject();
 
-//   void updateFlatAvailability(FlatType flatType, int quantityChange);
+   //   void updateFlatAvailability(FlatType flatType, int quantityChange);
 //
 //   void updateApplicantStatus(Application application, ApplicationStatus newStatus);
 //
@@ -40,5 +44,4 @@ public interface IOfficerService {
 //   void replyToEnquiry(Enquiry enquiry, String response);
 //
 //   // Account Management
-//   void changePassword(User officer, String newPassword);
 }
