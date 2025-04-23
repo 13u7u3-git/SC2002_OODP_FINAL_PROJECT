@@ -14,9 +14,9 @@ public class Applicant extends User {
    private final List<Enquiry> enquiries;
    private FlatType bookedFlatType;
 
-   public Applicant(String name, String nric, String password, int age, MaritalStatus maritalStatus, UserFilterSettings filterSettings,
+   public Applicant(String name, String nric, String password, int age, MaritalStatus maritalStatus,
                     List<Application> loadedApplications, List<Enquiry> loadedEnquiries, FlatType bookedFlatType) {
-      super(name, nric, password, age, maritalStatus, filterSettings);
+      super(name, nric, password, age, maritalStatus);
 
       // make defensive copies so the internal state can’t be modified from outside
       this.myApplications  = new ArrayList<>(loadedApplications);

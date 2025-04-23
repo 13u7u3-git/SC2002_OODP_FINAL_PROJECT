@@ -8,12 +8,8 @@ import user.UserFilterSettings;
 public class Manager extends User {
    Project currentProject;
 
-   public Manager(String name,
-                  String nric,
-                  String password,
-                  int age,
-                  MaritalStatus maritalStatus) {
-      super(name, nric, password, age, maritalStatus, new UserFilterSettings());
+   public Manager(String name, String nric, String password, int age, MaritalStatus maritalStatus) {
+      super(name, nric, password, age, maritalStatus);
       this.currentProject = null;
    }
 

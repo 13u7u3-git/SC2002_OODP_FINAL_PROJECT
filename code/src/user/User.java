@@ -3,10 +3,13 @@ package user;
 import java.io.Serializable;
 
 public class User implements Serializable {
+   // --- Core user fields ---
    private final String name;
    private final String nric;
    private final int age;
    private final MaritalStatus maritalStatus;
+
+   // --- Authentication ---
    private String password;
    private UserFilterSettings filterSettings;
 
@@ -16,17 +19,14 @@ public class User implements Serializable {
       this.password = null;
       this.age = 0;
       this.maritalStatus = null;
-      this.filterSettings = null;
    }
 
-   public User(String name, String nric, String password, int age, MaritalStatus maritalStatus,
-               UserFilterSettings filterSettings) {
+   public User(String name, String nric, String password, int age, MaritalStatus maritalStatus) {
       this.name = name;
       this.nric = nric;
       this.password = password;
       this.age = age;
       this.maritalStatus = maritalStatus;
-      this.filterSettings = filterSettings;
    }
 
    public String getName() {

@@ -10,14 +10,12 @@ public class UserFilterSettings implements Serializable {
    private String neighbourhood;
    private FlatType flatType;
    private LocalDate date;
-   private String sortOrder;
 
    public UserFilterSettings() {
       this.projectName = null;
       this.neighbourhood = null;
       this.flatType = null;
       this.date = null;
-      this.sortOrder = "alphabetical"; // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
    }
 
    public String getProjectName() {
@@ -44,7 +42,7 @@ public class UserFilterSettings implements Serializable {
       this.flatType = flatType;
    }
 
-   public LocalDate getDate(LocalDate date) {
+   public LocalDate getDate() {
       return date;
    }
 
@@ -52,19 +50,10 @@ public class UserFilterSettings implements Serializable {
       this.date = date;
    }
 
-   public String getSortOrder() {
-      return sortOrder;
-   }
-
-   public void setSortOrder(String sortOrder) {
-      this.sortOrder = sortOrder;
-   }
-
    public void reset() {
       projectName = null;
       neighbourhood = null;
       flatType = null;
       date = null;
-      sortOrder = "alphabetical";
    }
 }
