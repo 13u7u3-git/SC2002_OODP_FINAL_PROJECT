@@ -1,6 +1,6 @@
 package user;
 
-public class PasswordValidationService implements IPasswordValidationService {
+public class PasswordService implements IPasswordService {
 
    @Override
    public void isPasswordMatch(User user, String password) {

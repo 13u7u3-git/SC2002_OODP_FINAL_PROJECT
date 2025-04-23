@@ -5,7 +5,7 @@ import project.FlatType;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-public class UserFilterSettings implements Serializable {
+public class UserFilterSettings{
    private String projectName;
    private String neighbourhood;
    private FlatType flatType;

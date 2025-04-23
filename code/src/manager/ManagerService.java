@@ -2,7 +2,6 @@
 package manager;
 
 import enquiry.Enquiry;
-import interfaces.StaffService;
 import officer.IOfficerService;
 import officer.RegistrationForm;
 import officer.RegistrationStatus;

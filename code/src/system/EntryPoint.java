@@ -12,7 +12,7 @@ import project.IProjectService;
 import project.ProjectRegistry;
 import project.ProjectService;
 import user.IPasswordValidationService;
-import user.PasswordValidationService;
+import user.PasswordService;
 
 import java.util.Scanner;
 
@@ -90,7 +90,7 @@ public class EntryPoint {
    private void initializeServices(Boolean loadFromTxt) {
       // Create core services
       IUniqueIdService uniqueIdService = new UniqueIdService();
-      IPasswordValidationService passwordValidationService = new PasswordValidationService();
+      IPasswordValidationService passwordValidationService = new PasswordService();
 
       // Register core services
       ServiceRegistry.register(IUniqueIdService.class, uniqueIdService);

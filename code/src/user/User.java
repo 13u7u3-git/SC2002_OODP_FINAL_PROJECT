@@ -2,7 +2,7 @@ package user;
 
 import java.io.Serializable;
 
-public class User implements Serializable {
+public abstract class User implements Serializable, IPasswordService {
    // --- Core user fields ---
    private final String name;
    private final String nric;
@@ -60,6 +60,8 @@ public class User implements Serializable {
    public void setFilterSettings(UserFilterSettings filterSettings) {
       this.filterSettings = filterSettings;
    }
+
+
 
 
 }

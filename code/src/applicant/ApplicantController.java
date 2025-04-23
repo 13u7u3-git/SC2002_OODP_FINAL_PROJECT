@@ -5,6 +5,7 @@ import enquiry.EnquiryService;
 import project.FlatType;
 import project.Project;
 import project.ProjectService;
+import user.IPasswordService;
 import user.User;
 
 import java.util.ArrayList;
@@ -13,11 +14,13 @@ import java.util.function.Predicate;
 
 public class ApplicantController {
    private final IApplicantService applicantService;
+   private final IPasswordService passwordService;
    private final ProjectService projectService;
    private final EnquiryService enquiryService;
 
-   public ApplicantController(IApplicantService applicantService, ProjectService projectService, EnquiryService enquiryService) {
+   public ApplicantController(IApplicantService applicantService, IPasswordService passwordService, ProjectService projectService, EnquiryService enquiryService) {
       this.applicantService = applicantService;
+      this.passwordService = passwordService;
       this.projectService = projectService;
       this.enquiryService = enquiryService;
    }
