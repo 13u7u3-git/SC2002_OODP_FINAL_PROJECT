@@ -2,7 +2,6 @@ package enquiry;
 
 import applicant.Applicant;
 import helper.Color;
-import UniqueID.UniqueId;
 import project.Project;
 import project.ProjectRegistry;
 import project.ProjectService;
@@ -17,8 +16,8 @@ public class EnquiryService {
         this.projectService = projectService;
     }
 
-    public Enquiry createEnquiry(UniqueId uniqueId, Project project, Applicant applicant, String message) {
-        return new Enquiry(uniqueId.getNextEnquiryId(), project, applicant, message);
+    public Enquiry createEnquiry(int uniqueId, Project project, Applicant applicant, String message) {
+        return new Enquiry(uniqueId, project, applicant, message);
     }
 
     public void submitEnquiry(Enquiry enquiry) {
@@ -48,28 +47,21 @@ public class EnquiryService {
     // manager wont even have the option to delete. Need to confirm that current user deletes their own enquiry.
     // user cannot put random enquiry id and then it deletes that enquiry.
 
-    public void deleteEnquiry(Applicant currentUser, int enquiryId) {
-        Applicant currentUser = sessionManager.getLoggedInApplicant();
-        return applicantService.deleteEnquiryIfAllowed(currentUser.getId(), enquiryId);
-
-        Enquiry enquiry = enquiryRepository.findById(enquiryId);
-
-        if (enquiry == null) return false;
-        if (enquiry.getApplicantId() != applicantId) return false;
-        if (enquiry.getReply() != null && !enquiry.getReply().isBlank()) return false;
-
-        enquiryRepository.delete(enquiryId);
-        return true;
-
+    public boolean deleteEnquiry(Applicant currentUser, Enquiry enquiry) {
+        // Safety check: make sure the applicant owns the enquiry
         if (!enquiry.getApplicant().equals(currentUser)) {
-            Color.println("You are not allowed to delete this enquiry.", Color.RED);
-            return;
+            return false;
         }
 
+        // Check if the enquiry has a reply (can't delete)
+        if (enquiry.getReply() != null && !enquiry.getReply().isBlank()) {
+            return false;
+        }
 
         projectService.removeEnquiryFromProject(enquiry);
-        Color.println("Enquiry deleted successfully.", Color.GREEN);
+        return true;
     }
+
 
 
 
@@ -82,8 +74,8 @@ public class EnquiryService {
 
     }
 
-    public List<Enquiry> getEnquiriesForApplicant() {
-        return null;
+    public List<Enquiry> getEnquiriesForApplicant(Applicant applicant) {
+        return applicant.getEnquiries();
     }
 
     public void getEnquiriesFrom(Project project) {

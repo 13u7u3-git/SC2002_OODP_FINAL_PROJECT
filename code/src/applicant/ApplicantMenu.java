@@ -4,11 +4,17 @@ import enquiry.Enquiry;
 import helper.Color;
 import helper.TablePrinter;
 import interfaces.AbstractMenu;
+import project.FlatType;
+import project.Project;
 import system.SessionManager;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class ApplicantMenu extends AbstractMenu {
    private final TablePrinter tablePrinter;
@@ -77,43 +83,203 @@ Please enter your choice:""", Color.CYAN);
 
    private void handleViewAvailableProjects() {
       try {
-         List<List<String>> tableData = applicantController.getEligibleProjectsTableData();
-         if (tableData.isEmpty()) {
+         List<Project> allProjects = applicantController.getEligibleProjects();
+         if (allProjects.isEmpty()) {
             Color.println("No projects found.", Color.RED);
             return;
          }
+
          Color.println("--- All Projects ---", Color.YELLOW);
-         Integer COLUMN_WIDTH = 15;
-         tablePrinter.printTable(COLUMN_WIDTH, tableData);
+         printProjectsTable(allProjects);
+
+         Scanner sc = new Scanner(System.in);
+         Color.println("\nWould you like to filter the projects? (yes/no)", Color.CYAN);
+         String filterChoice = sc.nextLine().trim().toLowerCase();
+         if (!filterChoice.equals("yes")) return;
+
+         Color.println("Choose a filter option:", Color.CYAN);
+         Color.println("1. Project Name", Color.YELLOW);
+         Color.println("2. Neighbourhood", Color.YELLOW);
+         Color.println("3. Flat Type", Color.YELLOW);
+         Color.println("4. Date", Color.YELLOW);
+         Color.print("Enter your choice (1-4): ", Color.CYAN);
+         int choice = Integer.parseInt(sc.nextLine().trim());
+
+         Predicate<Project> filter = p -> true;
+         switch (choice) {
+            case 1:
+               Color.print("Enter project name: ", Color.CYAN);
+               String name = sc.nextLine().trim().toLowerCase();
+               filter = p -> p.getProjectName().toLowerCase().contains(name);
+               break;
+
+            case 2:
+               Color.print("Enter neighbourhood: ", Color.CYAN);
+               String hood = sc.nextLine().trim().toLowerCase();
+               filter = p -> p.getNeighborhood().toLowerCase().contains(hood);
+               break;
+
+            case 3:
+               try {
+                  Color.print("Enter flat type (TWO_ROOM / THREE_ROOM): ", Color.CYAN);
+                  String type = sc.nextLine().trim().toUpperCase();
+                  FlatType flatType = FlatType.valueOf(type);
+                  filter = p -> p.getAvailableFlats().getOrDefault(flatType, 0) > 0;
+               } catch (IllegalArgumentException e) {
+                  Color.println("Invalid flat type.", Color.RED);
+                  return;
+               }
+               break;
+
+            case 4:
+               try {
+                  Color.print("Enter date (yyyy-mm-dd): ", Color.CYAN);
+                  LocalDate inputDate = LocalDate.parse(sc.nextLine().trim());
+                  filter = p -> !inputDate.isBefore(p.getApplicationOpeningDate()) &&
+                          !inputDate.isAfter(p.getApplicationClosingDate());
+               } catch (Exception e) {
+                  Color.println("Invalid date format.", Color.RED);
+                  return;
+               }
+               break;
+
+            default:
+               Color.println("Invalid choice.", Color.RED);
+               return;
+         }
+
+         List<Project> filtered = allProjects.stream().filter(filter).collect(Collectors.toList());
+
+         if (filtered.isEmpty()) {
+            Color.println("No projects match your filter.", Color.RED);
+         } else {
+            Color.println("--- Filtered Projects ---", Color.YELLOW);
+            printProjectsTable(filtered);
+         }
+
       } catch (Exception e) {
          Color.println("Error: " + e.getMessage(), Color.RED);
       }
    }
 
+   private void printProjectsTable(List<Project> projects) {
+      Integer COLUMN_WIDTH = 15;
+      List<List<String>> tableData = new ArrayList<>();
+      tableData.add(List.of(
+              "Project ID", "Project Name", "Neighbourhood", "Visibility",
+              "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price",
+              "Opening Date", "Closing Date"
+      ));
+      for (Project p : projects) {
+         tableData.add(p.toPreviewTableRow());
+      }
+      tablePrinter.printTable(COLUMN_WIDTH, tableData);
+   }
+
    private void handleApplyForBTOProject() {
       try {
-         Color.print("Enter Project ID to apply for: ", Color.CYAN);
-         String projectId = scanner.nextLine();
-         Color.print("Enter Flat Type (e.g., TWO_ROOM, THREE_ROOM): ", Color.CYAN);
-         String flatTypeStr = scanner.nextLine();
-         FlatType flatType = FlatType.valueOf(flatTypeStr.toUpperCase());
-         applicantController.applyForProject(projectId, flatType);
-         Color.println("Application submitted successfully.", Color.GREEN);
+         if (applicantController.hasSuccessfulOrBookedApplication()) {
+            Color.println("You already have an application.", Color.RED);
+            return;
+         }
+
+         List<Project> eligibleProjects = applicantController.getEligibleProjects();
+         if (eligibleProjects.isEmpty()) {
+            Color.println("No eligible projects available at the moment.", Color.RED);
+            return;
+         }
+
+         // Show projects with numbering
+         Integer COLUMN_WIDTH = 15;
+         List<List<String>> tableData = new ArrayList<>();
+         tableData.add(List.of("Index", "Project ID", "Project Name", "Neighbourhood", "Two Room Units", "Three Room Units"));
+         for (int i = 0; i < eligibleProjects.size(); i++) {
+            Project p = eligibleProjects.get(i);
+            tableData.add(List.of(
+                    String.valueOf(i + 1),
+                    String.valueOf(p.getId()),
+                    p.getProjectName(),
+                    p.getNeighborhood(),
+                    String.valueOf(p.getTwoRoomUnits()),
+                    String.valueOf(p.getThreeRoomUnits())
+            ));
+         }
+         tablePrinter.printTable(COLUMN_WIDTH, tableData);
+
+         // Ask user to select project
+         Color.print("Enter the index number of the project to apply for: ", Color.CYAN);
+         int choice = Integer.parseInt(scanner.nextLine().trim()) - 1;
+
+         if (choice < 0 || choice >= eligibleProjects.size()) {
+            Color.println("Invalid project selection.", Color.RED);
+            return;
+         }
+
+         Project selectedProject = eligibleProjects.get(choice);
+         FlatType selectedFlatType = null;
+
+         int twoRoomUnits = selectedProject.getTwoRoomUnits();
+         int threeRoomUnits = selectedProject.getThreeRoomUnits();
+
+         if (twoRoomUnits > 0 && threeRoomUnits > 0) {
+            Color.println("This project has both TWO-ROOM and THREE-ROOM flats available.", Color.CYAN);
+            Color.print("Enter your choice (1 = TWO_ROOM, 2 = THREE_ROOM): ", Color.CYAN);
+            int flatChoice = Integer.parseInt(scanner.nextLine().trim());
+            if (flatChoice == 1) selectedFlatType = FlatType.TWO_ROOM;
+            else if (flatChoice == 2) selectedFlatType = FlatType.THREE_ROOM;
+            else {
+               Color.println("Invalid flat type selected.", Color.RED);
+               return;
+            }
+         } else if (twoRoomUnits > 0) {
+            Color.println("Only TWO-ROOM flats are available for this project.", Color.YELLOW);
+            selectedFlatType = FlatType.TWO_ROOM;
+         } else if (threeRoomUnits > 0) {
+            Color.println("Only THREE-ROOM flats are available for this project.", Color.YELLOW);
+            selectedFlatType = FlatType.THREE_ROOM;
+         } else {
+            Color.println("No flats are available in this project.", Color.RED);
+            return;
+         }
+
+         // Apply
+         applicantController.applyForProject(selectedProject.getId(), selectedFlatType);
+         Color.println("Application submitted successfully!", Color.GREEN);
+
+      } catch (NumberFormatException e) {
+         Color.println("Invalid number entered. Please try again.", Color.RED);
       } catch (IllegalArgumentException e) {
          Color.println("Error: " + e.getMessage(), Color.RED);
+      } catch (Exception e) {
+         Color.println("Unexpected error occurred: " + e.getMessage(), Color.RED);
       }
    }
 
+
    private void handleViewApplicationStatus() {
       try {
-         List<List<String>> applicationData = applicantController.getApplicationStatusTableData();
-         if (applicationData.isEmpty()) {
-            Color.println("No applications found.", Color.RED);
+         List<Application> myApplications = applicantController.getMyApplications();
+
+         if (myApplications.isEmpty()) {
+            Color.println("You have not submitted any applications.", Color.RED);
             return;
          }
+
+         List<List<String>> tableData = new ArrayList<>();
+         tableData.add(List.of("Project Name", "Date Applied", "Application Status"));
+
+         for (Application app : myApplications) {
+            tableData.add(List.of(
+                    app.getProject().getProjectName(),
+                    app.getDateApplied().toString(),
+                    app.getApplicationStatus().toString()
+            ));
+         }
+
+         Integer COLUMN_WIDTH = 20;
          Color.println("--- My Applications ---", Color.YELLOW);
-         Integer COLUMN_WIDTH = 15;
-         tablePrinter.printTable(COLUMN_WIDTH, applicationData);
+         tablePrinter.printTable(COLUMN_WIDTH, tableData);
+
       } catch (Exception e) {
          Color.println("Error: " + e.getMessage(), Color.RED);
       }
@@ -121,22 +287,78 @@ Please enter your choice:""", Color.CYAN);
 
    private void handleRequestWithdrawal() {
       try {
-         Color.print("Enter Application ID to withdraw: ", Color.CYAN);
-         String applicationId = scanner.nextLine();
-         applicantController.requestWithdrawal(applicationId);
-         Color.println("Withdrawal request submitted.", Color.GREEN);
+         Application application = applicantController.getPendingApplication();
+
+         if (application == null) {
+            Color.println("You do not have any pending application to withdraw.", Color.RED);
+            return;
+         }
+
+         // Show application details
+         Color.println("--- Your Current Application ---", Color.YELLOW);
+         Color.println("Project Name      : " + application.getProject().getProjectName(), Color.CYAN);
+         Color.println("Flat Type         : " + application.getFlatType(), Color.CYAN);
+         Color.println("Date Applied      : " + application.getDateApplied(), Color.CYAN);
+         Color.println("Application Status: " + application.getApplicationStatus(), Color.CYAN);
+         Color.println("-------------------------------------------", Color.YELLOW);
+
+         // Ask for confirmation
+         Color.print("Are you sure you want to withdraw this application? (Y/N): ", Color.CYAN);
+         String confirm = scanner.nextLine().trim().toUpperCase();
+
+         if (confirm.equals("Y")) {
+            applicantController.requestWithdrawal(application.getId());
+            Color.println("Withdrawal request submitted.", Color.GREEN);
+         } else {
+            Color.println("Withdrawal cancelled.", Color.YELLOW);
+         }
+
       } catch (IllegalArgumentException e) {
          Color.println("Error: " + e.getMessage(), Color.RED);
+      } catch (Exception e) {
+         Color.println("Unexpected error: " + e.getMessage(), Color.RED);
       }
    }
 
+
    private void handleSubmitEnquiry() {
       try {
-         Color.print("Enter Project ID for enquiry: ", Color.CYAN);
-         String projectId = scanner.nextLine();
+         List<Project> eligibleProjects = applicantController.getEligibleProjects();
+         if (eligibleProjects.isEmpty()) {
+            Color.println("No eligible projects available at the moment.", Color.RED);
+            return;
+         }
+
+         // Show projects with numbering
+         Integer COLUMN_WIDTH = 15;
+         List<List<String>> tableData = new ArrayList<>();
+         tableData.add(List.of("Index", "Project ID", "Project Name", "Neighbourhood", "Two Room Units", "Three Room Units"));
+         for (int i = 0; i < eligibleProjects.size(); i++) {
+            Project p = eligibleProjects.get(i);
+            tableData.add(List.of(
+                    String.valueOf(i + 1),
+                    String.valueOf(p.getId()),
+                    p.getProjectName(),
+                    p.getNeighborhood(),
+                    String.valueOf(p.getTwoRoomUnits()),
+                    String.valueOf(p.getThreeRoomUnits())
+            ));
+         }
+         tablePrinter.printTable(COLUMN_WIDTH, tableData);
+
+         // Ask user to select project
+         Color.print("Enter the index number of the project to apply for: ", Color.CYAN);
+         int choice = Integer.parseInt(scanner.nextLine().trim()) - 1;
+
+         if (choice < 0 || choice >= eligibleProjects.size()) {
+            Color.println("Invalid project selection.", Color.RED);
+            return;
+         }
+
+         Project selectedProject = eligibleProjects.get(choice);
          Color.print("Enter your enquiry: ", Color.CYAN);
          String enquiryText = scanner.nextLine();
-         applicantController.submitEnquiry(projectId, enquiryText);
+         applicantController.submitEnquiry(selectedProject.getId(), enquiryText);
          Color.println("Enquiry submitted successfully.", Color.GREEN);
       } catch (IllegalArgumentException e) {
          Color.println("Error: " + e.getMessage(), Color.RED);
@@ -145,11 +367,13 @@ Please enter your choice:""", Color.CYAN);
 
    private void handleViewMyEnquiries() {
       try {
-         List<List<String>> enquiryData = applicantController.getMyEnquiriesTableData();
-         if (enquiryData.isEmpty()) {
+         List<List<String>> enquiryData = applicantController.getMyEnquiriesAsTableData();
+
+         if (enquiryData == null || enquiryData.size() <= 1) {
             Color.println("No enquiries found.", Color.RED);
             return;
          }
+
          Color.println("--- My Enquiries ---", Color.YELLOW);
          Integer COLUMN_WIDTH = 15;
          tablePrinter.printTable(COLUMN_WIDTH, enquiryData);
@@ -158,45 +382,102 @@ Please enter your choice:""", Color.CYAN);
       }
    }
 
+
    private void handleEditEnquiry() {
       try {
-         Color.print("Enter Enquiry ID to edit: ", Color.CYAN);
-         String enquiryId = scanner.nextLine();
+         List<Enquiry> enquiries = applicantController.getMyEnquiries();
+         if (enquiries.isEmpty()) {
+            Color.println("You have no enquiries to edit.", Color.RED);
+            return;
+         }
+
+         // Display list with enumeration
+         Color.println("--- Your Enquiries ---", Color.YELLOW);
+         int index = 1;
+         for (Enquiry e : enquiries) {
+            Color.println(index + ". " + e.getProject().getProjectName() + " | " +
+                    e.getDateEnquired() + " | " +
+                    (e.getEnquiry() != null ? e.getEnquiry() : "-") + " | " +
+                    (e.getReply() != null ? "Reply Received" : "No Reply"), Color.CYAN);
+            index++;
+         }
+
+         // Choose enquiry
+         Color.print("Enter the number of the enquiry to edit: ", Color.CYAN);
+         int choice = Integer.parseInt(scanner.nextLine());
+
+         if (choice < 1 || choice > enquiries.size()) {
+            throw new IllegalArgumentException("Invalid enquiry selection.");
+         }
+
+         Enquiry selected = enquiries.get(choice - 1);
+         Color.println("Current Enquiry: " + selected.getEnquiry(), Color.YELLOW);
          Color.print("Enter new enquiry text: ", Color.CYAN);
          String newEnquiryText = scanner.nextLine();
-         applicantController.editEnquiry(enquiryId, newEnquiryText);
+
+         applicantController.editEnquiry(selected, newEnquiryText);
          Color.println("Enquiry updated successfully.", Color.GREEN);
+
+      } catch (NumberFormatException e) {
+         Color.println("Invalid input. Please enter a number.", Color.RED);
       } catch (IllegalArgumentException e) {
          Color.println("Error: " + e.getMessage(), Color.RED);
+      } catch (Exception e) {
+         Color.println("Unexpected error: " + e.getMessage(), Color.RED);
       }
    }
 
+
    public void handleDeleteEnquiry() {
-      List<Enquiry> myEnquiries = applicantController.getMyEnquiries();
-
-      if (myEnquiries.isEmpty()) {
-         Color.println("You have no enquiries to delete.", Color.RED);
-         return;
-      }
-
-      tablePrinter.printTable(20, EnquiryFormatter.formatEnquiries(myEnquiries));
-
-      Color.print("Enter the ID of the enquiry to delete: ", Color.GREEN);
-      String input = scanner.nextLine();
-
       try {
-         int enquiryId = Integer.parseInt(input);
-         boolean success = applicantController.deleteEnquiryIfAllowed(enquiryId);
+         List<Enquiry> myEnquiries = applicantController.getMyEnquiries();
+
+         if (myEnquiries.isEmpty()) {
+            Color.println("You have no enquiries to delete.", Color.RED);
+            return;
+         }
+
+         Color.println("--- Your Enquiries ---", Color.YELLOW);
+         for (int i = 0; i < myEnquiries.size(); i++) {
+            Enquiry e = myEnquiries.get(i);
+            Color.println((i + 1) + ". " +
+                    e.getProject().getProjectName() + " | " +
+                    e.getDateEnquired() + " | " +
+                    (e.getEnquiry() != null ? e.getEnquiry() : "-") + " | " +
+                    (e.getReply() != null ? "Reply Received" : "No Reply"), Color.CYAN);
+         }
+
+         Color.print("Enter the number of the enquiry to delete: ", Color.CYAN);
+         int choice = Integer.parseInt(scanner.nextLine());
+
+         if (choice < 1 || choice > myEnquiries.size()) {
+            throw new IllegalArgumentException("Invalid enquiry selection.");
+         }
+
+         Enquiry selected = myEnquiries.get(choice - 1);
+
+         Color.print("Are you sure you want to delete this enquiry? (y/n): ", Color.YELLOW);
+         String confirm = scanner.nextLine();
+         if (!confirm.equalsIgnoreCase("y")) {
+            Color.println("Deletion cancelled.", Color.YELLOW);
+            return;
+         }
+
+         boolean success = applicantController.deleteEnquiryIfAllowed(selected);
          if (success) {
             Color.println("Enquiry deleted successfully.", Color.GREEN);
          } else {
-            Color.println("Enquiry could not be deleted (might be replied to or not yours).", Color.RED);
+            Color.println("Enquiry could not be deleted. Enquiry may have been replied to already.", Color.RED);
          }
+
       } catch (NumberFormatException e) {
-         Color.println("Invalid input. Please enter a valid number.", Color.RED);
+         Color.println("Invalid input. Please enter a number.", Color.RED);
+      } catch (IllegalArgumentException e) {
+         Color.println("Error: " + e.getMessage(), Color.RED);
+      } catch (Exception e) {
+         Color.println("Unexpected error: " + e.getMessage(), Color.RED);
       }
    }
-
 
    private void handleChangePassword() {
       List<String> inputs = super.getInputsChangePassword();

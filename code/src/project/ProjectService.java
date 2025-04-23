@@ -2,12 +2,17 @@ package project;
 
 import UniqueID.IUniqueIdService;
 import UniqueID.IdType;
+import applicant.Application;
+import enquiry.Enquiry;
+import helper.Color;
+import helper.TablePrinter;
 import officer.IRegistrationValidationService;
 import officer.RegistrationForm;
 import officer.RegistrationValidationService;
 import system.ServiceRegistry;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -115,5 +120,18 @@ public class ProjectService implements IProjectService {
       registrationValidationService.validateRegistration(form);
       Project project = getProjectById(form.getProjectId());
       project.addRegistrationForm(form);
+   }
+
+   public void addApplicationToProject(Application app) throws IllegalArgumentException {
+      Project project = getProjectById(app.getId());
+      project.getApplications().add(app);
+   }
+
+
+   public void addEnquiryToProject(Enquiry enquiry) {
+
+   }
+
+   public void removeEnquiryFromProject(Enquiry enquiry) {
    }
 }

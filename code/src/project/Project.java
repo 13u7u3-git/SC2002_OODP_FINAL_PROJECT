@@ -147,19 +147,19 @@ public class Project implements Serializable {
    }
 
    public Integer getTwoRoomUnits() {
-      return availableFlats.get(FlatType.TWO_ROOM);
+      return availableFlats.getOrDefault(FlatType.TWO_ROOM, 0);
    }
 
    public Double getTwoRoomPrice() {
-      return flatPrices.get(FlatType.TWO_ROOM);
+      return flatPrices.getOrDefault(FlatType.TWO_ROOM, 0.0);
    }
 
    public Integer getThreeRoomUnits() {
-      return availableFlats.get(FlatType.THREE_ROOM);
+      return availableFlats.getOrDefault(FlatType.THREE_ROOM, 0);
    }
 
    public Double getThreeRoomPrice() {
-      return flatPrices.get(FlatType.THREE_ROOM);
+      return flatPrices.getOrDefault(FlatType.THREE_ROOM, 0.0);
    }
 
 
@@ -192,24 +192,28 @@ public class Project implements Serializable {
               "==============================================";
    }
 
-   public List<String> toTableRow() {
+   public List<String> toPreviewTableRow() {
       return List.of(
               String.valueOf(id),
               projectName,
               neighborhood,
               visibility ? "Visible" : "Hidden",
               String.valueOf(getTwoRoomUnits()),
-              String.valueOf(getTwoRoomPrice()),
+              String.format("$%.2f", getTwoRoomPrice()),
               String.valueOf(getThreeRoomUnits()),
-              String.valueOf(getThreeRoomPrice()),
+              String.format("$%.2f", getThreeRoomPrice()),
               applicationOpeningDate.toString(),
-              applicationClosingDate.toString(),
-              manager != null ? manager.getName() : "N/A",
-              String.valueOf(availableOfficerSlots),
-              officers != null ? officers.stream().map(Officer::getName).collect(Collectors.joining(", ")) : "N/A"
+              applicationClosingDate.toString()
       );
    }
 
+   public static List<String> getTableHeader() {
+      return List.of(
+              "Project ID", "Project Name", "Neighbourhood", "Visibility",
+              "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price",
+              "Appln..Opening Date", "Appln..Closing Date"
+      );
+   }
 }
 
 

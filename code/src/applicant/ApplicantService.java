@@ -1,27 +1,24 @@
 package applicant;
 
-import UniqueID.IUniqueIdService;
+import enquiry.Enquiry;
+import helper.Color;
 import project.FlatType;
-import project.IProjectService;
 import project.Project;
+import project.ProjectService;
 import system.ServiceRegistry;
-import user.IPasswordValidationService;
 import user.User;
 
 import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class ApplicantService implements IApplicantService {
-   private final IProjectService projectService;
-   private final IUniqueIdService uniqueIdService;
-   private final IPasswordValidationService passwordValidationService;
-
+   private final ProjectService projectService;
    private Applicant applicant;
 
-   public ApplicantService() {
-      this.projectService = ServiceRegistry.get(IProjectService.class);
-      this.uniqueIdService = ServiceRegistry.get(IUniqueIdService.class);
-      this.passwordValidationService = ServiceRegistry.get(IPasswordValidationService.class);
+   public ApplicantService(ProjectService projectService) {
+      this.projectService = projectService;
    }
 
    @Override
@@ -30,13 +27,8 @@ public class ApplicantService implements IApplicantService {
    }
 
    @Override
-   public void setUser(Applicant applicant) {
-      this.applicant = applicant;
-   }
-
-   @Override
-   public IPasswordValidationService getPasswordValidationService() {
-      return this.passwordValidationService;
+   public void setUser(User applicant) {
+      this.applicant = (Applicant) applicant;
    }
 
    @Override
@@ -83,5 +75,15 @@ public class ApplicantService implements IApplicantService {
          // Applicants under 21 are not eligible
          return false;
       };
+   }
+
+   @Override
+   public List<Application> getApplicationsByApplicant(Applicant user) {
+      return user.getMyApplications();
+   }
+
+   @Override
+   public List<Enquiry> getEnquiriesByApplicant(Applicant user) {
+      return user.getEnquiries();
    }
 }

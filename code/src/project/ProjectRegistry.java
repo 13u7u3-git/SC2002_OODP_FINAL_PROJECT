@@ -67,8 +67,7 @@ public class ProjectRegistry implements Serializable, Filterable<Project> {
    public List<Project> filter(Predicate<Project> predicate) {
       return projects.stream()
               .filter(predicate)
-              .collect(Collectors
-                      .toList());
+              .collect(Collectors.toList());
    }
 
    public Integer size() {
