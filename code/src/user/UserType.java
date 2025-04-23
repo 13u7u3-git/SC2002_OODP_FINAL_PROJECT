@@ -1,7 +1,7 @@
-package user;
+// package user;
 
-public enum UserType {
-   APPLICANT,
-   OFFICER,
-   MANAGER
-}
+// public enum UserType {
+//    APPLICANT,
+//    OFFICER,
+//    MANAGER
+// }
