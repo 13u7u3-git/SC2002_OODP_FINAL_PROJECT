@@ -1,8 +1,11 @@
+//updated managerMenu, with all the methods implemented 
 package manager;
 
+import applicant.ApplicantController;
+import enquiry.Enquiry;
 import helper.Color;
 import helper.TablePrinter;
-import interfaces.Menu;
+import interfaces.AbstractMenu;
 import officer.RegistrationStatus;
 import system.SessionManager;
 
@@ -11,105 +14,79 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-public class ManagerMenu extends Menu {
-   private final Scanner scanner;
+public class ManagerMenu extends AbstractMenu {
    private final TablePrinter tablePrinter;
    private final SessionManager sessionManager;
-   private final ManagerController managerController;
+   private final ManagerService managerService;
 
-   public ManagerMenu(Scanner scanner, TablePrinter tablePrinter, SessionManager sessionManager, ManagerController managerController) {
+   public ManagerMenu(Scanner scanner, TablePrinter tablePrinter, SessionManager sessionManager, ManagerService managerService) {
       super(scanner);
-      this.scanner = scanner;
       this.tablePrinter = tablePrinter;
       this.sessionManager = sessionManager;
-      this.managerController = managerController;
+      this.managerService = managerService;
    }
 
-   protected void display() {
-      Color.print("========== HDB Manager Menu ==========\n" +
-              "1. Create New BTO Project\n" +
-              "2. Edit Existing BTO Project\n" +
-              "3. Delete BTO Project\n" +
-              "4. Toggle Project Visibility\n" +
-              "5. View All Projects\n" +
-              "6. Filter My Projects\n" +
-              "7. View Current Project\n" +
-              "8. View Pending Officer Registrations\n" +
-              "9. Approve/Reject Officer Registrations\n" +
-              "10. View Applicant Applications\n" +
-              "11. Approve/Reject Applicant Applications\n" +
-              "12. Approve/Reject Withdrawal Requests\n" +
-              "13. View All Project Enquiries\n" +
-              "14. Reply to Project Enquiries\n" +
-              "15. Generate Applicant/Booking Reports\n" +
-              "16. Change Password\n" +
-              "0. Logout\n" +
-              "======================================\n" +
-              "Please enter your choice:", Color.CYAN);
+   @Override
+   public void display() {
+      Color.print("""           
+         ========================================================================== Manager Menu ==================================================================================
+ 1. Create New BTO Project                 |     2. Edit Existing BTO Project     |     3. Delete BTO Project                       |    4. Toggle Project Visibility
+ 5. View All Projects                      |     6. Filter My Projects            |     7. View Current Project                     |    8. View Pending Officer Registrations
+ 9. Approve/Reject Officer Registrations   |     10. View Applicant Applications  |     11. Approve/Reject Applicant Applications   |    12. Approve/Reject Withdrawal Requests
+ 13. View All Project Enquiries            |     14. Reply to Project Enquiries   |     15. Generate Applicant/Booking Reports      |    16. Change Password
+ 0. Logout
+=========================================================================================================================================================================================
+Please enter your choice:""", Color.CYAN);
    }
+   @Override
+   public  void handleInput() {
+      while (true) { 
+         try {
+            String input = scanner.nextLine().trim();
 
-   protected void handleInput() {
-      String input = scanner.nextLine();
+            //input ranges from 0-16
+            if (!input.matches("^(1[0-6]|[0-9])$")){
+               Color.println("Error: Please enter a digit (0-9)", Color.RED);
+               continue;  // Skip to next iteration (ask again)
+            }
 
-      switch (input) {
-         case "1" -> {
-            handleCreateProject();
-         }
-         case "2" -> {
-            handleEditProject();
-         }
-         case "3" -> {
-            handleDeleteProject();
-         }
-         case "4" -> {
-            handleToggleVisibility();
-         }
-         case "5" -> {
-            handleViewAllProjects();
-         }
-         case "6" -> {
-            handleFilterMyProjects();
-         }
-         case "7" -> {
-            handleViewCurrentProject();
-         }
-         case "8" -> {
-            handleViewPendingOfficerRegistrations();
-         }
-         case "9" -> {
-            handleApproveRejectOfficerRegistrations();
-         }
-         case "10" -> {
-            //handleViewApplicantApplications();
-         }
-         case "11" -> {
-            //handleApproveRejectApplicantApplications();
-         }
-         case "12" -> {
-            //handleApproveRejectWithdrawalRequests();
-         }
-         case "13" -> {
-            //handleViewAllProjectEnquiries();
-         }
-         case "14" -> {
-            //handleReplyToProjectEnquiries();
-         }
-         case "15" -> {
-            //handleGenerateApplicantBookingReports();
-         }
-         case "16" -> {
-            //handleChangePassword();
-         }
-         case "0" -> {
-            sessionManager.logout();
-         }
-         default -> {
-            Color.println("Invalid choice", Color.RED);
+            //process the valid inputs      
+            switch (input) {
+               case "1" -> handleCreateProject();
+               case "2" -> handleEditProject();         
+               case "3" -> handleDeleteProject();         
+               case "4" -> handleToggleVisibility();         
+               case "5" -> handleViewAllProjects();
+               case "6" -> handleFilterMyProjects();
+               case "7" -> handleViewCurrentProject();         
+               case "8" -> handleViewPendingOfficerRegistrations();         
+               case "9" -> handleApproveRejectOfficerRegistrations();         
+               case "10" -> handleViewApplicantApplications();         
+               case "11" -> handleApproveRejectApplicantApplications();         
+               case "12" -> handleApproveRejectWithdrawalRequests();         
+               case "13" -> handleViewAllProjectEnquiries();         
+               case "14" -> handleReplyToProjectEnquiries();         
+               case "15" -> handleGenerateApplicantBookingReports();         
+               case "16" -> handleChangePassword();         
+               case "0" -> {
+                  sessionManager.logout();
+                  return; //Exit the loop after logout          
+               }  
+            }
+            return;
+         } catch (NoSuchElementException e) {
+            Color.println("Error: Input stream closed", Color.RED);
+            return;
+         } catch (IllegalStateException e) {
+            Color.println("Error: Scanner is closed", Color.RED);
+            return;
          }
       }
    }
+         
 
    @Override
    public void run() {
@@ -118,7 +95,6 @@ public class ManagerMenu extends Menu {
          handleInput();
       }
    }
-
 
    private void handleCreateProject() {
       try {
@@ -151,7 +127,7 @@ public class ManagerMenu extends Menu {
          int officerSlots = Integer.parseInt(scanner.nextLine());
 
          try {
-            managerController.createProject(name, neighbourhood, twoRoomFlatCount, twoRoomPrice, threeRoomFlatCount, threeRoomPrice,
+            managerService.createProject(name, neighbourhood, twoRoomFlatCount, twoRoomPrice, threeRoomFlatCount, threeRoomPrice,
                     applicationOpeningDate, applicationClosingDate, sessionManager.getCurrentUser().getName(), officerSlots, new ArrayList<>());
             Color.println("Project created successfully!", Color.GREEN);
          }
@@ -175,7 +151,7 @@ public class ManagerMenu extends Menu {
       Color.print("Enter Project ID to delete:", Color.GREEN);
       int projectId = Integer.parseInt(scanner.nextLine());
 
-      if (managerController.deleteProject(projectId)) {
+      if (managerService.deleteProject(projectId)) {
          Color.println("Project deleted successfully!", Color.GREEN);
       }
       else {
@@ -186,7 +162,7 @@ public class ManagerMenu extends Menu {
    private void handleViewAllProjects() {
 
       try {
-         List<List<String>> tableData = managerController.getAllProjectsTableData();
+         List<List<String>> tableData = managerService.getAllProjectsTableData();
          if (tableData.isEmpty()) {
             Color.println("No projects found.", Color.RED);
             return;
@@ -201,12 +177,12 @@ public class ManagerMenu extends Menu {
    }
 
    private void handleFilterMyProjects() {
-      managerController.getMyProjectsTableData();
+      managerService.getMyProjectsTableData();
    }
 
    private void handleViewCurrentProject() {
       try {
-         Color.println(managerController.getCurrentProjectData(), Color.YELLOW);
+         Color.println(managerService.getCurrentProjectData(), Color.YELLOW);
       }
       catch (Exception e) {
          Color.println("Error viewing current project: " + e.getMessage(), Color.RED);
@@ -215,14 +191,14 @@ public class ManagerMenu extends Menu {
 
    private void handleToggleVisibility() {
       Color.println("My Projects:", Color.GREEN);
-      managerController.getMyProjectsTableData();//prints my projects on screen
+      managerService.getMyProjectsTableData();//prints my projects on screen
       Color.print("Enter Project ID to toggle visibility:", Color.GREEN);
       Integer projectId = Integer.parseInt(scanner.nextLine());
       if (projectId == null) {
          Color.println("Invalid Project ID.", Color.RED);
          return;
       }
-      if (managerController.toggleVisibility(projectId)) {
+      if (managerService.toggleVisibility(projectId)) {
          Color.println("Visibility toggled successfully!", Color.GREEN);
       }
       else {
@@ -233,7 +209,7 @@ public class ManagerMenu extends Menu {
 
    private void handleEditProject() {
       Color.println("My Projects:", Color.GREEN);
-      managerController.getMyProjectsTableData();//prints my projects on screen
+      managerService.getMyProjectsTableData();//prints my projects on screen
       Color.print("Enter Project ID to edit (0 to exit):", Color.GREEN);
       Integer projectName = Integer.parseInt(scanner.nextLine());
       if (projectName.equals(0)) {
@@ -256,27 +232,27 @@ public class ManagerMenu extends Menu {
             case "1" -> {
                Color.print("Enter New Project Name:", Color.GREEN);
                String newName = scanner.nextLine();
-               managerController.editProject(projectName, "1", newName);
+               managerService.editProject(projectName, "1", newName);
             }
             case "2" -> {
                Color.print("Enter New Project Neighbourhood:", Color.GREEN);
                String newNeighbourhood = scanner.nextLine();
-               managerController.editProject(projectName, "2", newNeighbourhood);
+               managerService.editProject(projectName, "2", newNeighbourhood);
             }
             case "3" -> {
                Color.print("Enter New Application Opening Date (yyyy-MM-dd):", Color.GREEN);
                LocalDate newApplicationOpeningDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ISO_LOCAL_DATE);
-               managerController.editProject(projectName, "3", newApplicationOpeningDate);
+               managerService.editProject(projectName, "3", newApplicationOpeningDate);
             }
             case "4" -> {
                Color.print("Enter New Application Closing Date (yyyy-MM-dd):", Color.GREEN);
                LocalDate newApplicationClosingDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ISO_LOCAL_DATE);
-               managerController.editProject(projectName, "4", newApplicationClosingDate);
+               managerService.editProject(projectName, "4", newApplicationClosingDate);
             }
             case "5" -> {
                Color.print("Enter New Visibility (true/false):", Color.GREEN);
                boolean newVisibility = Boolean.parseBoolean(scanner.nextLine());
-               managerController.editProject(projectName, "5", newVisibility);
+               managerService.editProject(projectName, "5", newVisibility);
             }
             case "6" -> {
                Color.println("Exiting Edit Menu.", Color.BLUE);
@@ -292,7 +268,7 @@ public class ManagerMenu extends Menu {
 
    private Boolean handleViewPendingOfficerRegistrations() {
       try {
-         List<List<String>> tableData = managerController.getPendingRegistrationTableData();
+         List<List<String>> tableData = managerService.getPendingRegistrationTableData();
          if (tableData == null || tableData.isEmpty()) {
             Color.println("No pending officer registrations.", Color.RED);
             return false;
@@ -323,7 +299,7 @@ public class ManagerMenu extends Menu {
                RegistrationStatus isApproved = action.equals("A") ? RegistrationStatus.APPROVED : RegistrationStatus.REJECTED;
 
                // Let the controller handle the type checking and processing
-               boolean success = managerController.processOfficerRegistration(identifier, isApproved);
+               boolean success = managerService.processOfficerRegistration(identifier, isApproved);
 
                if (success) {
                   Color.println("Registration " + isApproved + " successfully!", Color.GREEN);
@@ -342,4 +318,91 @@ public class ManagerMenu extends Menu {
          Color.println("Error processing registration: " + e.getMessage(), Color.RED);
       }
    }
+
+   private void handleViewApplicantApplications() {
+      List<List<String>> tableData = managerService.getApplicantApplications();
+      if (tableData == null || tableData.isEmpty()) {
+         Color.println("No applicant applications available.", Color.RED);
+         return;
+      }
+      Color.println("--- Applicant Applications ---", Color.YELLOW);
+      tablePrinter.printTable(15, tableData);
+   }
+
+   private void handleApproveRejectApplicantApplications() {
+      handleViewApplicantApplications();
+      Color.print("Enter Application ID to approve/reject: ", Color.GREEN);
+      String appId = scanner.nextLine();
+      Color.print("Enter 'A' to approve or 'R' to reject: ", Color.GREEN);
+      String action = scanner.nextLine().toUpperCase();
+
+      boolean result = managerService.processApplicantApplication(appId, action);
+      if (result) {
+         Color.println("Application " + (action.equals("A") ? "approved" : "rejected") + " successfully!", Color.GREEN);
+      } else {
+         Color.println("Failed to process application.", Color.RED);
+      }
+   }
+
+   private void handleApproveRejectWithdrawalRequests() {
+      List<List<String>> withdrawalData = managerService.getWithdrawalRequests();
+      if (withdrawalData == null || withdrawalData.isEmpty()) {
+         Color.println("No withdrawal requests.", Color.RED);
+         return;
+      }
+      tablePrinter.printTable(15, withdrawalData);
+      Color.print("Enter Request ID to approve/reject: ", Color.GREEN);
+      String id = scanner.nextLine();
+      Color.print("Enter 'A' to approve or 'R' to reject: ", Color.GREEN);
+      String action = scanner.nextLine().toUpperCase();
+      boolean result = managerService.processWithdrawalRequest(id, action);
+      if (result) {
+         Color.println("Withdrawal request " + (action.equals("A") ? "approved" : "rejected") + ".", Color.GREEN);
+      } else {
+         Color.println("Failed to process withdrawal.", Color.RED);
+      }
+   }
+
+   private void handleViewAllProjectEnquiries() {
+      List<Enquiry> enquiries = managerService.getAllEnquiries();
+      if (enquiries == null || enquiries.isEmpty()) {
+         Color.println("No enquiries found.", Color.RED);
+         return;
+      }
+      tablePrinter.printTable(15, managerService.formatEnquiries(enquiries));
+   }
+
+   private void handleReplyToProjectEnquiries() {
+      handleViewAllProjectEnquiries();
+      Color.print("Enter Enquiry ID to reply to: ", Color.GREEN);
+      String enquiryId = scanner.nextLine();
+      Color.print("Enter your reply: ", Color.GREEN);
+      String reply = scanner.nextLine();
+      boolean success = managerService.replyToEnquiry(enquiryId, reply);
+      if (success) {
+         Color.println("Reply sent successfully.", Color.GREEN);
+      } else {
+         Color.println("Failed to send reply.", Color.RED);
+      }
+   }
+
+   private void handleGenerateApplicantBookingReports() {
+      String report = managerService.generateBookingReport();
+      if (report == null || report.isEmpty()) {
+         Color.println("No data to generate report.", Color.RED);
+      } else {
+         Color.println("--- Applicant/Booking Report ---\n" + report, Color.YELLOW);
+      }
+   }
+
+   private void handleChangePassword() {
+      List<String> inputs = super.getInputsChangePassword();
+      try {
+         managerService.changePassword(inputs.get(0), inputs.get(1), inputs.get(2));
+         Color.println("Password changed successfully.", Color.GREEN);
+      } catch (IllegalArgumentException e) {
+         Color.println("Password change error: " + e.getMessage(), Color.RED);
+      }
+   }
+
 }//Menu ends here
