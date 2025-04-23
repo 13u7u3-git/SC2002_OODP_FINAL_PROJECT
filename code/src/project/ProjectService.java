@@ -1,3 +1,4 @@
+// updated, will not be using the interfaces in the projects previously 
 package project;
 
 import UniqueID.IUniqueIdService;
@@ -16,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class ProjectService implements IProjectService {
+public class ProjectService {
    private final ProjectRegistry projectRegistry;
    private final IUniqueIdService uniqueIdService;
-   private final IProjectValidationService projectValidationService;
+   private final ProjectValidationService projectValidationService;
    private final IRegistrationValidationService registrationValidationService;
 
    public ProjectService(ProjectRegistry projectRegistry) {
@@ -29,7 +30,6 @@ public class ProjectService implements IProjectService {
       this.registrationValidationService = new RegistrationValidationService(projectRegistry);
    }
 
-   @Override
    public Project getProjectById(Integer projectId) {
       return projectRegistry.getProjects().stream()
               .filter(p -> p.getId().equals(projectId))
@@ -37,7 +37,6 @@ public class ProjectService implements IProjectService {
               .orElse(null);
    }
 
-   @Override
    public Project getProjectByName(String projectName) {
       return projectRegistry.getProjects().stream()
               .filter(p -> p.getProjectName().equals(projectName))
@@ -45,66 +44,55 @@ public class ProjectService implements IProjectService {
               .orElse(null);
    }
 
-   @Override
    public List<Project> getAllProjects() {
       return projectRegistry.getProjects();
    }
 
-
-   // --- Project Management ---
-   @Override
    public Project createProject(String projectName, String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
                                 Integer threeRoomUnits, Double threeRoomPrice, LocalDate applicationOpeningDate,
                                 LocalDate applicationClosingDate, String manager, Integer availableOfficerSlots,
                                 List<String> officers) {
       Project project = new Project(uniqueIdService.generateUniqueId(IdType.PROJECT_ID), projectName, neighbourhood,
               twoRoomUnits, twoRoomPrice, threeRoomUnits, threeRoomPrice, applicationOpeningDate, applicationClosingDate, manager, availableOfficerSlots, officers);
-      validateNewProject(project);//throws exception if project is invalid and propagates to caller
+      validateNewProject(project);
       addProjectToRegistry(project);
       return project;
    }
 
-   @Override
    public void deleteProject(Project project) {
       projectRegistry.removeProject(project);
    }
 
-   @Override
    public String returnNameIfProjectExists(String projectName) {
-      //check existence of project by name and id
       String returnName = projectRegistry.getProjects().stream()
               .filter(p -> p.getProjectName().equals(projectName))
               .findFirst()
               .map(Project::getProjectName)
               .orElse(null);
-      //check by id
       if (returnName == null) {
-         returnName = projectRegistry.getProjects().stream()
-                 .filter(p -> p.getId().equals(Integer.parseInt(projectName)))
-                 .findFirst()
-                 .map(Project::getProjectName)
-                 .orElse(null);
+         try {
+            returnName = projectRegistry.getProjects().stream()
+                    .filter(p -> p.getId().equals(Integer.parseInt(projectName)))
+                    .findFirst()
+                    .map(Project::getProjectName)
+                    .orElse(null);
+         } catch (NumberFormatException ignored) {}
       }
       return returnName;
    }
 
-   @Override
    public void addProjectToRegistry(Project project) {
       projectRegistry.addProject(project);
    }
 
-   @Override
    public void removeProjectFromRegistry(Project project) {
       projectRegistry.removeProject(project);
    }
 
-   @Override
    public List<Project> getFilteredProjects(Predicate<Project> predicate) {
       return projectRegistry.filter(predicate);
    }
 
-   // --- Validation ---
-   @Override
    public void validateNewProject(Project project) throws IllegalArgumentException {
       projectValidationService.validateProjectNameUnique(project, getAllProjects());
       projectValidationService.validateApplicationDates(project.getApplicationOpeningDate(),
@@ -115,7 +103,6 @@ public class ProjectService implements IProjectService {
       projectValidationService.validateOfficerSlots(project.getAvailableOfficerSlots());
    }
 
-   @Override
    public void addRegistrationToProject(RegistrationForm form) throws IllegalArgumentException {
       registrationValidationService.validateRegistration(form);
       Project project = getProjectById(form.getProjectId());
@@ -127,11 +114,11 @@ public class ProjectService implements IProjectService {
       project.getApplications().add(app);
    }
 
-
    public void addEnquiryToProject(Enquiry enquiry) {
-
+      // Placeholder for future implementation
    }
 
    public void removeEnquiryFromProject(Enquiry enquiry) {
+      // Placeholder for future implementation
    }
 }
