@@ -30,9 +30,8 @@ public class EntryPoint {
       SessionManager sessionManager = ServiceRegistry.get(SessionManager.class);
       IApplicantService applicantService = ServiceRegistry.get(IApplicantService.class);
       IOfficerService officerService = ServiceRegistry.get(IOfficerService.class);
-      IManagerService managerService = ServiceRegistry.get(IManagerService.class);
+      IManagerService managerService = ServiceRegistry.get(IManagerService.class); // use interface
       OfficerController officerController = ServiceRegistry.get(OfficerController.class);
-      ManagerController managerController = ServiceRegistry.get(ManagerController.class);
       ApplicantController applicantController = ServiceRegistry.get(ApplicantController.class);
 
       // Create login menu
@@ -52,7 +51,7 @@ public class EntryPoint {
 
             if (user instanceof Manager) {
                managerService.setUser((Manager) user);
-               currentMenu = new ManagerMenu(scanner, tablePrinter, sessionManager, managerController);
+               currentMenu = new ManagerMenu(scanner, tablePrinter, sessionManager, (ManagerService) managerService);
             }
             else if (user instanceof Officer) {
                officerService.setUser((Officer) user);
@@ -108,16 +107,17 @@ public class EntryPoint {
       IProjectService projectService = new ProjectService(projectRegistry);
       ServiceRegistry.register(IProjectService.class, projectService);
 
-      // Create and register officer service
+      // Create and register applicant and officer services
       IApplicantService applicantService = new ApplicantService();
       ServiceRegistry.register(IApplicantService.class, applicantService);
 
       IOfficerService officerService = new OfficerService();
       ServiceRegistry.register(IOfficerService.class, officerService);
 
-      // Create and register manager service
-      IManagerService managerService = new ManagerService();
+      // Create and register the combined manager service
+      ManagerService managerService = new ManagerService();
       ServiceRegistry.register(IManagerService.class, managerService);
+      ServiceRegistry.register(ManagerService.class, managerService); // register concrete if needed elsewhere
 
       // Create and register controllers
       ApplicantController applicantController = new ApplicantController();
@@ -125,8 +125,5 @@ public class EntryPoint {
 
       OfficerController officerController = new OfficerController();
       ServiceRegistry.register(OfficerController.class, officerController);
-
-      ManagerController managerController = new ManagerController();
-      ServiceRegistry.register(ManagerController.class, managerController);
    }
 }
