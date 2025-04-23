@@ -8,109 +8,110 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
-public class Application {
-   private final int id;
-   private final User applicant;
-   private final Project project;
-   private final FlatType flatType;
-   private final LocalDate dateApplied;
-   private ApplicationStatus applicationStatus;
-   private BookingStatus bookingStatus;
-   private WithdrawalRequestStatus withdrawalRequestStatus;
+public class Application implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-   protected Application(int id, User applicant, Project project, FlatType flatType) {
-      this.id = id;
-      this.applicant = applicant;
-      this.project = project;
-      this.flatType = flatType;
-      this.applicationStatus = ApplicationStatus.PENDING;
-      this.bookingStatus = BookingStatus.NOT_BOOKED;
-      this.withdrawalRequestStatus = WithdrawalRequestStatus.NOT_REQUESTED;
-      this.dateApplied = LocalDate.now();
-   }
+    private final int id;
+    private final User applicant;
+    private final Project project;
+    private final FlatType flatType;
+    private final LocalDate dateApplied;
+    private ApplicationStatus applicationStatus;
+    private BookingStatus bookingStatus;
+    private WithdrawalRequestStatus withdrawalRequestStatus;
 
-   // to load data for data persistence
-   protected Application(int id, User applicant, Project project, FlatType flatType, ApplicationStatus applicationStatus, BookingStatus bookingStatus,
-                         WithdrawalRequestStatus withdrawalRequestStatus, LocalDate dateApplied) {
-      this.id = id;
-      this.applicant = applicant;
-      this.project = project;
-      this.flatType = flatType;
-      this.applicationStatus = applicationStatus;
-      this.bookingStatus = bookingStatus;
-      this.withdrawalRequestStatus = withdrawalRequestStatus;
-      this.dateApplied = dateApplied;
-   }
+    protected Application(int id, User applicant, Project project, FlatType flatType) {
+        this.id = id;
+        this.applicant = applicant;
+        this.project = project;
+        this.flatType = flatType;
+        this.applicationStatus = ApplicationStatus.PENDING;
+        this.bookingStatus = BookingStatus.NOT_BOOKED;
+        this.withdrawalRequestStatus = WithdrawalRequestStatus.NOT_REQUESTED;
+        this.dateApplied = LocalDate.now();
+    }
 
-   public int getId() {
-      return id;
-   }
+    protected Application(int id, User applicant, Project project, FlatType flatType,
+                          ApplicationStatus applicationStatus, BookingStatus bookingStatus,
+                          WithdrawalRequestStatus withdrawalRequestStatus, LocalDate dateApplied) {
+        this.id = id;
+        this.applicant = applicant;
+        this.project = project;
+        this.flatType = flatType;
+        this.applicationStatus = applicationStatus;
+        this.bookingStatus = bookingStatus;
+        this.withdrawalRequestStatus = withdrawalRequestStatus;
+        this.dateApplied = dateApplied;
+    }
 
-   public User getApplicant() {
-      return applicant;
-   }
+    public int getId() {
+        return id;
+    }
 
-   public Project getProject() {
-      return project;
-   }
+    public User getApplicant() {
+        return applicant;
+    }
 
-   public FlatType getFlatType() {
-      return flatType;
-   }
+    public Project getProject() {
+        return project;
+    }
 
-   public ApplicationStatus getApplicationStatus() {
-      return applicationStatus;
-   }
+    public FlatType getFlatType() {
+        return flatType;
+    }
 
-   void setApplicationStatus(ApplicationStatus applicationStatus) {
-      this.applicationStatus = applicationStatus;
-   }
+    public ApplicationStatus getApplicationStatus() {
+        return applicationStatus;
+    }
 
-   public BookingStatus getBookingStatus() {
-      return bookingStatus;
-   }
+    void setApplicationStatus(ApplicationStatus applicationStatus) {
+        this.applicationStatus = applicationStatus;
+    }
 
-   public void setBookingStatus(BookingStatus bookingStatus) {
-      this.bookingStatus = bookingStatus;
-   }
+    public BookingStatus getBookingStatus() {
+        return bookingStatus;
+    }
 
-   public WithdrawalRequestStatus getWithdrawalRequestStatus() {
-      return withdrawalRequestStatus;
-   }
+    public void setBookingStatus(BookingStatus bookingStatus) {
+        this.bookingStatus = bookingStatus;
+    }
 
-   void setWithdrawalRequestStatus(WithdrawalRequestStatus withdrawalRequestStatus) {
-      this.withdrawalRequestStatus = withdrawalRequestStatus;
-   }
+    public WithdrawalRequestStatus getWithdrawalRequestStatus() {
+        return withdrawalRequestStatus;
+    }
 
-   public LocalDate getDateApplied() {
-      return dateApplied;
-   }
+    void setWithdrawalRequestStatus(WithdrawalRequestStatus withdrawalRequestStatus) {
+        this.withdrawalRequestStatus = withdrawalRequestStatus;
+    }
 
-   @Override
-   public String toString() {
-      return "============== Application Details ==============\n" +
-              "Application ID      : " + id + "\n" +
-              "Applicant           : " + applicant.getName() + "\n" +
-              "Project             : " + project.getProjectName() + "\n" +
-              "Flat Type           : " + flatType + "\n" +
-              "Application Status  : " + applicationStatus + "\n" +
-              "Withdrawal Status   : " + withdrawalRequestStatus + "\n" +
-              "Booking Status      : " + bookingStatus + "\n" +
-              "Date Applied        : " + dateApplied + "\n" +
-              "==============================================";
-   }
+    public LocalDate getDateApplied() {
+        return dateApplied;
+    }
 
+    @Override
+    public String toString() {
+        return "============== Application Details ==============\n" +
+                "Application ID      : " + id + "\n" +
+                "Applicant           : " + applicant.getName() + "\n" +
+                "Project             : " + project.getProjectName() + "\n" +
+                "Flat Type           : " + flatType + "\n" +
+                "Application Status  : " + applicationStatus + "\n" +
+                "Withdrawal Status   : " + withdrawalRequestStatus + "\n" +
+                "Booking Status      : " + bookingStatus + "\n" +
+                "Date Applied        : " + dateApplied + "\n" +
+                "==============================================";
+    }
 
-   public List<String> toTableRow() {
-      return List.of(
-              String.valueOf(id),
-              applicant.getName(),
-              project.getProjectName(),
-              flatType.name(),
-              dateApplied.toString(),
-              applicationStatus.name(),
-              bookingStatus.name(),
-              withdrawalRequestStatus.name()
-      );
-   }
+    public List<String> toTableRow() {
+        return List.of(
+                String.valueOf(id),
+                applicant.getName(),
+                project.getProjectName(),
+                flatType.name(),
+                dateApplied.toString(),
+                applicationStatus.name(),
+                bookingStatus.name(),
+                withdrawalRequestStatus.name()
+        );
+    }
 }
