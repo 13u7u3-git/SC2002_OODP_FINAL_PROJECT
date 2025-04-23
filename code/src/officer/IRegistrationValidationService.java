@@ -1,5 +1,5 @@
-package officer;
-
-public interface IRegistrationValidationService {
-   void validateRegistration(RegistrationForm form) throws IllegalArgumentException;
-}
+//package officer;
+//
+//public interface IRegistrationValidationService {
+//   void validateRegistration(RegistrationForm form) throws IllegalArgumentException;
+//}

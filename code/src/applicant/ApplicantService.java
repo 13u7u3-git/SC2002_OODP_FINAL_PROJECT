@@ -1,15 +1,12 @@
 package applicant;
 
 import enquiry.Enquiry;
-import helper.Color;
 import project.FlatType;
 import project.Project;
 import project.ProjectService;
-import system.ServiceRegistry;
 import user.User;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 

@@ -65,11 +65,10 @@ Please enter your choice:""", Color.CYAN);
                case "8" -> handleDeleteEnquiry();
                case "9" -> handleChangePassword();
                case "0" -> {
-                  sessionManager.logout();
-                  return;  // Exit the loop after logout
+                     sessionManager.logout();
+                     return;  // Exit the loop after logout
                }
             }
-            return;
 
          } catch (NoSuchElementException e) {
             Color.println("Error: Input stream closed", Color.RED);
@@ -81,7 +80,7 @@ Please enter your choice:""", Color.CYAN);
       }
    }
 
-   private void handleViewAvailableProjects() {
+   public void handleViewAvailableProjects() {
       try {
          List<Project> allProjects = applicantController.getEligibleProjects();
          if (allProjects.isEmpty()) {
@@ -162,7 +161,7 @@ Please enter your choice:""", Color.CYAN);
       }
    }
 
-   private void printProjectsTable(List<Project> projects) {
+   public void printProjectsTable(List<Project> projects) {
       Integer COLUMN_WIDTH = 15;
       List<List<String>> tableData = new ArrayList<>();
       tableData.add(List.of(
@@ -176,7 +175,7 @@ Please enter your choice:""", Color.CYAN);
       tablePrinter.printTable(COLUMN_WIDTH, tableData);
    }
 
-   private void handleApplyForBTOProject() {
+   public void handleApplyForBTOProject() {
       try {
          if (applicantController.hasSuccessfulOrBookedApplication()) {
             Color.println("You already have an application.", Color.RED);
@@ -256,7 +255,7 @@ Please enter your choice:""", Color.CYAN);
    }
 
 
-   private void handleViewApplicationStatus() {
+   public void handleViewApplicationStatus() {
       try {
          List<Application> myApplications = applicantController.getMyApplications();
 
@@ -285,7 +284,7 @@ Please enter your choice:""", Color.CYAN);
       }
    }
 
-   private void handleRequestWithdrawal() {
+   public void handleRequestWithdrawal() {
       try {
          Application application = applicantController.getPendingApplication();
 
@@ -321,7 +320,7 @@ Please enter your choice:""", Color.CYAN);
    }
 
 
-   private void handleSubmitEnquiry() {
+   public void handleSubmitEnquiry() {
       try {
          List<Project> eligibleProjects = applicantController.getEligibleProjects();
          if (eligibleProjects.isEmpty()) {
@@ -365,7 +364,7 @@ Please enter your choice:""", Color.CYAN);
       }
    }
 
-   private void handleViewMyEnquiries() {
+   public void handleViewMyEnquiries() {
       try {
          List<List<String>> enquiryData = applicantController.getMyEnquiriesAsTableData();
 
@@ -383,7 +382,7 @@ Please enter your choice:""", Color.CYAN);
    }
 
 
-   private void handleEditEnquiry() {
+   public void handleEditEnquiry() {
       try {
          List<Enquiry> enquiries = applicantController.getMyEnquiries();
          if (enquiries.isEmpty()) {
@@ -479,7 +478,7 @@ Please enter your choice:""", Color.CYAN);
       }
    }
 
-   private void handleChangePassword() {
+   public void handleChangePassword() {
       List<String> inputs = super.getInputsChangePassword();
       try {
          applicantController.changePassword(inputs.get(0), inputs.get(1), inputs.get(2));

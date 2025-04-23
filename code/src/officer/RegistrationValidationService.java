@@ -5,14 +5,13 @@ import project.ProjectRegistry;
 
 import java.time.LocalDate;
 
-public class RegistrationValidationService implements IRegistrationValidationService {
+public class RegistrationValidationService {
    private final ProjectRegistry projectRegistry;
 
    public RegistrationValidationService(ProjectRegistry projectRegistry) {
       this.projectRegistry = projectRegistry;
    }
 
-   @Override
    public void validateRegistration(RegistrationForm form) {
       Project targetProject = projectRegistry.getProjects().stream()
               .filter(p -> p.getId().equals(form.getProjectId()))

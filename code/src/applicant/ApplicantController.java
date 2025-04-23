@@ -56,7 +56,7 @@ public class ApplicantController {
       if (project == null) {
          throw new IllegalArgumentException("Project not found.");
       }
-      Application application = new Application(projectId, applicant, project, flatType);
+      Application application = new Application(uniqueID_here, applicant, project, flatType);
       projectService.addApplicationToProject(application);
    }
 
