@@ -7,7 +7,7 @@ import officer.IOfficerService;
 import officer.RegistrationForm;
 import officer.RegistrationStatus;
 import project.FlatType;
-import project.IProjectService;
+import project.ProjectService;
 import project.Project;
 import system.ServiceRegistry;
 import user.IPasswordValidationService;
@@ -18,13 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ManagerService implements IManagerService, StaffService {
-    private final IProjectService projectService;
+public class ManagerService implements StaffService {
+    private final ProjectService projectService;
     private final IPasswordValidationService passwordValidationService;
     private Manager manager;
 
     public ManagerService() {
-        this.projectService = ServiceRegistry.get(IProjectService.class);
+        this.projectService = ServiceRegistry.get(ProjectService.class);
         this.passwordValidationService = ServiceRegistry.get(IPasswordValidationService.class);
     }
 
