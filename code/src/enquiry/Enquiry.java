@@ -6,8 +6,9 @@ import user.User;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
-public class Enquiry implements Serializable {
+public class Enquiry {
    private final int id;
    private final Project project;
    private final Applicant applicant;
@@ -83,15 +84,29 @@ public class Enquiry implements Serializable {
 
    @Override
    public String toString() {
-      return "Enquiry{" +
-              "id=" + id +
-              ", project=" + project +
-              ", applicant=" + applicant +
-              ", dateEnquired=" + dateEnquired +
-              ", enquiry='" + enquiry + '\'' +
-              ", reply='" + reply + '\'' +
-              ", respondent=" + respondent +
-              ", dateReplied=" + dateReplied +
-              '}';
+      return "============== Enquiry Details ==============\n" +
+              "Enquiry ID          : " + id + "\n" +
+              "Project             : " + project.getProjectName() + "\n" +
+              "Applicant           : " + applicant.getName() + "\n" +
+              "Date Enquired       : " + dateEnquired + "\n" +
+              "Enquiry             : " + enquiry + "\n" +
+              "Reply               : " + (reply != null ? reply : "N/A") + "\n" +
+              "Respondent          : " + (respondent != null ? respondent.getName() : "N/A") + "\n" +
+              "Date Replied        : " + (dateReplied != null ? dateReplied : "Pending") + "\n" +
+              "==============================================";
    }
+
+   public List<String> toTableRow() {
+      return List.of(
+              String.valueOf(id),
+              project.getProjectName(),
+              applicant.getName(),
+              dateEnquired.toString(),
+              enquiry,
+              reply != null ? reply : "N/A",
+              respondent != null ? respondent.getName() : "Unanswered",
+              dateReplied != null ? dateReplied.toString() : "Pending"
+      );
+   }
+
 }

@@ -1,7 +1,10 @@
 package applicant;
 
+import enquiry.Enquiry;
+import enquiry.EnquiryService;
 import project.IProjectService;
 import project.Project;
+import project.ProjectService;
 import system.ServiceRegistry;
 
 import java.util.ArrayList;
@@ -10,15 +13,22 @@ import java.util.function.Predicate;
 
 public class ApplicantController {
    private final IApplicantService applicantService;
-   private final IProjectService projectService;
+   private final ProjectService projectService;
+   private final EnquiryService enquiryService;
 
-   public ApplicantController() {
-      this.applicantService = ServiceRegistry.get(IApplicantService.class);
-      this.projectService = ServiceRegistry.get(IProjectService.class);
+   public ApplicantController(IApplicantService applicantService, ProjectService projectService, EnquiryService enquiryService) {
+      this.applicantService = applicantService;
+      this.projectService = projectService;
+      this.enquiryService = enquiryService;
    }
 
    public void changePassword(String oldPassword, String newPassword, String confirmPassword) {
       applicantService.changePassword(oldPassword, newPassword, confirmPassword);
+   }
+
+   public boolean deleteEnquiryIfAllowed(int enquiryId) {
+      Applicant currentUser = sessionManager.getLoggedInApplicant();
+      return applicantService.deleteEnquiryIfAllowed(currentUser.getId(), enquiryId);
    }
 
    public List<List<String>> getEligibleProjectsTableData() {
@@ -39,6 +49,10 @@ public class ApplicantController {
          }
          return tableData;
       }
+   }
+
+   public List<Enquiry> getMyEnquiries() {
+      return enquiryService.getEnquiriesForApplicant();
    }
 }
 

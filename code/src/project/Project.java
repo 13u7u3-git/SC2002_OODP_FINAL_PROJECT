@@ -2,6 +2,7 @@ package project;
 
 import applicant.Application;
 import enquiry.Enquiry;
+import officer.Officer;
 import officer.RegistrationForm;
 
 import java.io.Serial;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Project implements Serializable {
    @Serial
@@ -190,6 +192,23 @@ public class Project implements Serializable {
               "==============================================";
    }
 
+   public List<String> toTableRow() {
+      return List.of(
+              String.valueOf(id),
+              projectName,
+              neighborhood,
+              visibility ? "Visible" : "Hidden",
+              String.valueOf(getTwoRoomUnits()),
+              String.valueOf(getTwoRoomPrice()),
+              String.valueOf(getThreeRoomUnits()),
+              String.valueOf(getThreeRoomPrice()),
+              applicationOpeningDate.toString(),
+              applicationClosingDate.toString(),
+              manager != null ? manager.getName() : "N/A",
+              String.valueOf(availableOfficerSlots),
+              officers != null ? officers.stream().map(Officer::getName).collect(Collectors.joining(", ")) : "N/A"
+      );
+   }
 
 }
 

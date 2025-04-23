@@ -7,7 +7,7 @@ import officer.Officer;
 
 import java.util.Scanner;
 
-public class LoginMenu extends Menu {
+public class LoginMenu implements Menu {
 
    private final SessionManager sessionManager;
    private final Scanner scanner;

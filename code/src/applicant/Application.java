@@ -6,8 +6,9 @@ import user.User;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
-public class Application implements Serializable {
+public class Application {
    private final int id;
    private final User applicant;
    private final Project project;
@@ -87,15 +88,29 @@ public class Application implements Serializable {
 
    @Override
    public String toString() {
-      return "Application {" +
-              "ID=" + id +
-              ", Applicant=" + applicant.getName() +
-              ", Project=" + project.getProjectName() +
-              ", Flat Type=" + flatType +
-              ", Application Status=" + applicationStatus +
-              ", Withdrawal Status=" + withdrawalRequestStatus +
-              ", Booking Status=" + bookingStatus +
-              ", Date Applied=" + dateApplied +
-              '}';
+      return "============== Application Details ==============\n" +
+              "Application ID      : " + id + "\n" +
+              "Applicant           : " + applicant.getName() + "\n" +
+              "Project             : " + project.getProjectName() + "\n" +
+              "Flat Type           : " + flatType + "\n" +
+              "Application Status  : " + applicationStatus + "\n" +
+              "Withdrawal Status   : " + withdrawalRequestStatus + "\n" +
+              "Booking Status      : " + bookingStatus + "\n" +
+              "Date Applied        : " + dateApplied + "\n" +
+              "==============================================";
+   }
+
+
+   public List<String> toTableRow() {
+      return List.of(
+              String.valueOf(id),
+              applicant.getName(),
+              project.getProjectName(),
+              flatType.name(),
+              dateApplied.toString(),
+              applicationStatus.name(),
+              bookingStatus.name(),
+              withdrawalRequestStatus.name()
+      );
    }
 }

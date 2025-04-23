@@ -76,7 +76,16 @@ public class RegistrationForm implements Serializable {
               "==============================================";
    }
 
-   public List<String> toStringAsList() {
-      return List.of(id.toString(), officerName, nric, dateApplied.toString(), status.toString(), projectId.toString(), projectName);
+   public List<String> toTableRow() {
+      return List.of(
+              String.valueOf(id),
+              officerName,
+              nric,
+              String.valueOf(projectId),
+              projectName,
+              dateApplied.toString(),
+              status.name()
+      );
    }
+
 }
