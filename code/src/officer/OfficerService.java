@@ -1,20 +1,25 @@
 package officer;
 
-import applicant.ApplicantController;
-import applicant.ApplicantMenu;
-import applicant.ApplicantService;
+import UniqueID.IDGenerator;
+import UniqueID.IdType;
+import applicant.Application;
+import applicant.ApplicationStatus;
+import applicant.BookingStatus;
 import enquiry.Enquiry;
 import helper.Color;
+import project.FlatType;
 import project.Project;
 import project.ProjectService;
 import system.ServiceRegistry;
+import user.IUserService;
 import user.User;
 import user.UserRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class OfficerService {
+public class OfficerService implements IUserService {
     private final ProjectService projectService;
     private Officer officer;
 
@@ -55,8 +60,6 @@ public class OfficerService {
             }
         }
     }
-
-    // --- Unified Controller Methods Below ---
 
     public List<List<String>> getAllProjectsTableData() throws Exception {
         List<Project> projects = projectService.getAllProjects();
@@ -102,7 +105,7 @@ public class OfficerService {
             Color.println("Form not Created. Project not found or Error Creating Form. Try Again", Color.RED);
             return null;
         }
-        RegistrationForm form = new RegistrationForm(uniqueIdService.generateUniqueId(IdType.REGISTRATION_FORM_ID), officer.getName(), officer.getNric(), projectService.getProjectByName(projectStr).getId(), projectStr);
+        RegistrationForm form = new RegistrationForm(IDGenerator.getInstance().getNextId(IdType.REGISTRATION), officer.getName(), officer.getNric(), projectService.getProjectByName(projectStr).getId(), projectStr);
         projectService.addRegistrationToProject(form);
         setOfficerStatus(OfficerStatus.PENDING);
         setCurrentRegistrationForm(form);
@@ -116,7 +119,7 @@ public class OfficerService {
     }
 
     public RegistrationForm createRegistrationForm(String projectName) {
-        return new RegistrationForm(uniqueIdService.generateUniqueId(IdType.REGISTRATION_FORM_ID), officer.getName(), officer.getNric(), projectService.getProjectByName(projectName).getId(), projectName);
+        return new RegistrationForm(IDGenerator.getInstance().getNextId(IdType.REGISTRATION), officer.getName(), officer.getNric(), projectService.getProjectByName(projectName).getId(), projectName);
     }
 
     public void sendRegistrationRequest(RegistrationForm form) {
@@ -166,13 +169,57 @@ public class OfficerService {
         officer.setCurrentProject(currentProject);
     }
 
-    public IPasswordValidationService getPasswordValidationService() {
-        return this.passwordValidationService;
+    public void bookFlat(Application application) {
+        Project project = officer.getCurrentProject();
+        if (project == null) {
+            throw new IllegalStateException("You are not assigned to any project.");
+        }
+
+        // Ensure the application is successful
+        if (application.getApplicationStatus() != ApplicationStatus.SUCCESSFUL) {
+            throw new IllegalArgumentException("Only successful applications can be booked.");
+        }
+
+        // Check the flat type and decrement the corresponding count
+        if (application.getFlatType() == FlatType.TWO_ROOM) {
+            if (project.getTwoRoomUnits() > 0) {
+                Map<FlatType, Integer> remainingFlats = project.getRemainingFlats();
+                if (remainingFlats.containsKey(FlatType.TWO_ROOM)) {
+                    int currentCount = remainingFlats.get(FlatType.TWO_ROOM);
+                    if (currentCount > 0) {
+                        remainingFlats.put(FlatType.TWO_ROOM, currentCount - 1);
+                    }
+                }
+
+            } else {
+                throw new IllegalStateException("No available two-room flats left.");
+            }
+        } else if (application.getFlatType() == FlatType.THREE_ROOM) {
+            if (project.getThreeRoomUnits() > 0) {
+                Map<FlatType, Integer> remainingFlats = project.getRemainingFlats();
+                if (remainingFlats.containsKey(FlatType.THREE_ROOM)) {
+                    int currentCount = remainingFlats.get(FlatType.THREE_ROOM);
+                    if (currentCount > 0) {
+                        remainingFlats.put(FlatType.THREE_ROOM, currentCount - 1);
+                    }
+                }
+
+            } else {
+                throw new IllegalStateException("No available three-room flats left.");
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid flat type.");
+        }
+
+        // Generate receipt or further booking actions
+        projectService.updateProject(project);
+
+        application.setBookingStatus(BookingStatus.BOOKED);
+        projectService.updateApplicationStatus(application);
+
+        Color.println("Flat booked successfully for " + application.getApplicant().getName(), Color.GREEN);
     }
 
-    public void changePassword(String oldPassword, String newPassword, String confirmPassword) {
-        passwordValidationService.changePassword(officer, oldPassword, newPassword, confirmPassword);
-    }
 }
 
 

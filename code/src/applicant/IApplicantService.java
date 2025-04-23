@@ -9,12 +9,13 @@ import java.util.function.Predicate;
 
 public interface IApplicantService {
 
-   User getUser();
-   void setUser(User applicant);
+    User getUser();
 
-   Predicate<Project> isEligibleForApplicant(Applicant applicant);
+    void setUser(User applicant);
 
-   List<Application> getApplicationsByApplicant(Applicant user);
+    Predicate<Project> isEligibleForApplicant(Applicant applicant);
 
-   List<Enquiry> getEnquiriesByApplicant(Applicant user);
+    List<Application> getApplicationsByApplicant(Applicant user);
+
+    List<Enquiry> getEnquiriesByApplicant(Applicant user);
 }

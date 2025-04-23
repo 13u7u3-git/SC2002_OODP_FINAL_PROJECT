@@ -10,22 +10,16 @@ public class IDGenerator implements Serializable {
     private static final String SAVE_FILE = "id_generator.ser";
     private static IDGenerator instance;
 
-    private Map<String, Integer> counters = new HashMap<>();
+    private final Map<IdType, Integer> counters = new HashMap<>();
 
-    private IDGenerator() {}
+    private IDGenerator() {
+    }
 
     public static IDGenerator getInstance() {
         if (instance == null) {
             instance = load();
         }
         return instance;
-    }
-
-    public synchronized int getNextId(String type) {
-        int current = counters.getOrDefault(type, 0);
-        counters.put(type, current + 1);
-        save();
-        return current;
     }
 
     private static IDGenerator load() {
@@ -35,6 +29,15 @@ public class IDGenerator implements Serializable {
             return new IDGenerator(); // Start fresh if no file
         }
     }
+
+    public int getNextId(IdType type) {
+        // Use the enum to get the current counter value
+        int current = counters.getOrDefault(type, 0);
+        counters.put(type, current + 1);
+        save();
+        return current;
+    }
+
 
     private void save() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(SAVE_FILE))) {

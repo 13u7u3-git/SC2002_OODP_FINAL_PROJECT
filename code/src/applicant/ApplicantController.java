@@ -1,187 +1,172 @@
 package applicant;
 
+import UniqueID.IDGenerator;
+import UniqueID.IdType;
 import enquiry.Enquiry;
 import enquiry.EnquiryService;
 import project.FlatType;
 import project.Project;
 import project.ProjectService;
-import user.IPasswordService;
+import user.IUserService;
 import user.User;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class ApplicantController {
-   private final IApplicantService applicantService;
-   private final IPasswordService passwordService;
-   private final ProjectService projectService;
-   private final EnquiryService enquiryService;
+public class ApplicantController implements IUserService {
+    private final IApplicantService applicantService;
+    private final ProjectService projectService;
+    private final EnquiryService enquiryService;
 
-   public ApplicantController(IApplicantService applicantService, IPasswordService passwordService, ProjectService projectService, EnquiryService enquiryService) {
-      this.applicantService = applicantService;
-      this.passwordService = passwordService;
-      this.projectService = projectService;
-      this.enquiryService = enquiryService;
-   }
+    public ApplicantController(IApplicantService applicantService, ProjectService projectService, EnquiryService enquiryService) {
+        this.applicantService = applicantService;
+        this.projectService = projectService;
+        this.enquiryService = enquiryService;
+    }
 
-   public List<Project> getEligibleProjects() {
-      Applicant applicant = (Applicant) applicantService.getUser();
-      Predicate<Project> predicate = applicantService.isEligibleForApplicant(applicant);
-      return projectService.getFilteredProjects(predicate);
-   }
+    public List<Project> getEligibleProjects() {
+        Applicant applicant = (Applicant) applicantService.getUser();
+        Predicate<Project> predicate = applicantService.isEligibleForApplicant(applicant);
+        return projectService.getFilteredProjects(predicate);
+    }
 
-//   public List<List<String>> getEligibleProjectsTableData() {
-//      List<Project> projects = getEligibleProjects();
-//
-//      if (projects == null || projects.isEmpty()) {
-//         return List.of();
-//      }
-//
-//      List<String> headerRow = List.of(
-//              "Project ID", "Project Name", "Neighbourhood", "Visibility",
-//              "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price",
-//              "Appln..Opening Date", "Appln..Closing Date"
-//      );
-//
-//      List<List<String>> tableData = new ArrayList<>();
-//      tableData.add(headerRow);
-//
-//      for (Project p : projects) {
-//         tableData.add(p.toTableRow().subList(0, 10)); // be sure this order is consistent
-//      }
-//
-//      return tableData;
-//   }
-   public void applyForProject(int projectId, FlatType flatType) {
-      Applicant applicant = (Applicant) applicantService.getUser();
-      Project project = projectService.getProjectById(projectId);
-      if (project == null) {
-         throw new IllegalArgumentException("Project not found.");
-      }
-      Application application = new Application(uniqueID_here, applicant, project, flatType);
-      projectService.addApplicationToProject(application);
-   }
+    public void applyForProject(int projectId, FlatType flatType) {
+        Applicant applicant = (Applicant) applicantService.getUser();
+        Project project = projectService.getProjectById(projectId);
+        if (project == null) {
+            throw new IllegalArgumentException("Project not found.");
+        }
 
-   public List<Application> getMyApplications() {
-      Applicant applicant = (Applicant) applicantService.getUser();
-      return applicant.getMyApplications();
-   }
+        int applicationId = IDGenerator.getInstance().getNextId(IdType.APPLICATION);
+        Application application = new Application(applicationId, applicant, project, flatType);
+        projectService.addApplicationToProject(application);
+    }
 
-   public void requestWithdrawal(int applicationId) {
-      Application application = getApplicationById(applicationId);
-      if (application == null) {
-         throw new IllegalArgumentException("Application not found.");
-      }
-      application.setWithdrawalRequestStatus(WithdrawalRequestStatus.PENDING);
-   }
 
-   public void submitEnquiry(int projectId, String enquiryText) {
-      Applicant applicant = (Applicant) applicantService.getUser();
-      Project project = projectService.getProjectById(projectId);
-      if (project == null) {
-         throw new IllegalArgumentException("Project not found.");
-      }
-      Enquiry enquiry = enquiryService.createEnquiry(69, project, applicant, enquiryText);
-      enquiryService.submitEnquiry(enquiry);
-   }
+    public List<Application> getMyApplications() {
+        Applicant applicant = (Applicant) applicantService.getUser();
+        return applicant.getMyApplications();
+    }
 
-   public List<Enquiry> getMyEnquiries() {
-      Applicant applicant = (Applicant) applicantService.getUser();
-      return enquiryService.getEnquiriesForApplicant(applicant);
-   }
+    public void requestWithdrawal(int applicationId) {
+        Application application = getApplicationById(applicationId);
+        if (application == null) {
+            throw new IllegalArgumentException("Application not found.");
+        }
+        application.setWithdrawalRequestStatus(WithdrawalRequestStatus.PENDING);
+    }
 
-   public void editEnquiry(Enquiry enquiry, String newEnquiryText) {
-      Applicant applicant = (Applicant) applicantService.getUser();
+    public void submitEnquiry(int projectId, String enquiryText) {
+        Applicant applicant = (Applicant) applicantService.getUser();
+        Project project = projectService.getProjectById(projectId);
+        if (project == null) {
+            throw new IllegalArgumentException("Project not found.");
+        }
 
-      if (enquiry == null) {
-         throw new IllegalArgumentException("Enquiry not found.");
-      }
-      enquiryService.editEnquiry(applicant, enquiry, newEnquiryText);
-   }
+        int enquiryId = IDGenerator.getInstance().getNextId(IdType.ENQUIRY);
+        Enquiry enquiry = enquiryService.createEnquiry(enquiryId, project, applicant, enquiryText);
+        enquiryService.submitEnquiry(enquiry);
+    }
 
-   public boolean deleteEnquiryIfAllowed(Enquiry enquiry) {
-      Applicant applicant = (Applicant) applicantService.getUser();
 
-      if (enquiry == null) {
-         throw new IllegalArgumentException("Enquiry not found.");
-      }
+    public List<Enquiry> getMyEnquiries() {
+        Applicant applicant = (Applicant) applicantService.getUser();
+        return enquiryService.getEnquiriesForApplicant(applicant);
+    }
 
-       return enquiryService.deleteEnquiry(applicant, enquiry);
-   }
+    public void editEnquiry(Enquiry enquiry, String newEnquiryText) {
+        Applicant applicant = (Applicant) applicantService.getUser();
 
-   public void changePassword(String oldPassword, String newPassword, String confirmPassword) {
-      passwordService.changePassword(oldPassword, newPassword, confirmPassword);
-   }
+        if (enquiry == null) {
+            throw new IllegalArgumentException("Enquiry not found.");
+        }
+        enquiryService.editEnquiry(applicant, enquiry, newEnquiryText);
+    }
 
-   private Application getApplicationById(int applicationId) {
-      Applicant applicant = (Applicant) applicantService.getUser();
-      return applicant.getMyApplications().stream()
-              .filter(app -> app.getId() == applicationId)
-              .findFirst()
-              .orElse(null);
-   }
+    public boolean deleteEnquiryIfAllowed(Enquiry enquiry) {
+        Applicant applicant = (Applicant) applicantService.getUser();
 
-   public boolean hasSuccessfulOrBookedApplication() {
-      User user = applicantService.getUser();
-      if (!(user instanceof Applicant)) {
-         throw new IllegalStateException("Current user is not an applicant.");
-      }
+        if (enquiry == null) {
+            throw new IllegalArgumentException("Enquiry not found.");
+        }
 
-      List<Application> applications = applicantService.getApplicationsByApplicant((Applicant) user);
+        return enquiryService.deleteEnquiry(applicant, enquiry);
+    }
 
-      for (Application app : applications) {
-         if (app.getApplicationStatus() == ApplicationStatus.SUCCESSFUL ||
-                 app.getBookingStatus() == BookingStatus.BOOKED) {
-            return true;
-         }
-      }
 
-      return false;
-   }
+    public void handlePasswordChange(String oldPass, String newPass1, String newPass2) {
+        changePassword(applicantService.getUser(), oldPass, newPass1, newPass2); // Uses IUserService default
+    }
 
-   public Application getPendingApplication() {
-      User user = applicantService.getUser();
-      if (!(user instanceof Applicant)) {
-         throw new IllegalStateException("Current user is not an applicant.");
-      }
+    private Application getApplicationById(int applicationId) {
+        Applicant applicant = (Applicant) applicantService.getUser();
+        return applicant.getMyApplications().stream()
+                .filter(app -> app.getId() == applicationId)
+                .findFirst()
+                .orElse(null);
+    }
 
-      List<Application> applications = applicantService.getApplicationsByApplicant((Applicant) user);
+    public boolean hasSuccessfulOrBookedApplication() {
+        User user = applicantService.getUser();
+        if (!(user instanceof Applicant)) {
+            throw new IllegalStateException("Current user is not an applicant.");
+        }
 
-      for (Application app : applications) {
-         if (app.getApplicationStatus() == ApplicationStatus.PENDING) {
-            return app;
-         }
-      }
+        List<Application> applications = applicantService.getApplicationsByApplicant((Applicant) user);
 
-      return null; // No pending application found
-   }
+        for (Application app : applications) {
+            if (app.getApplicationStatus() == ApplicationStatus.SUCCESSFUL ||
+                    app.getBookingStatus() == BookingStatus.BOOKED) {
+                return true;
+            }
+        }
 
-   public List<List<String>> getMyEnquiriesAsTableData() {
-      User user = applicantService.getUser();
-      if (!(user instanceof Applicant)) {
-         throw new IllegalStateException("Current user is not an applicant.");
-      }
+        return false;
+    }
 
-      List<Enquiry> enquiries = applicantService.getEnquiriesByApplicant((Applicant) user);
-      List<List<String>> tableData = new ArrayList<>();
+    public Application getPendingApplication() {
+        User user = applicantService.getUser();
+        if (!(user instanceof Applicant)) {
+            throw new IllegalStateException("Current user is not an applicant.");
+        }
 
-      // Add header row
-      tableData.add(List.of("ID", "Project", "Date", "Question", "Reply"));
+        List<Application> applications = applicantService.getApplicationsByApplicant((Applicant) user);
 
-      // Add each enquiry row
-      for (Enquiry e : enquiries) {
-         tableData.add(List.of(
-                 String.valueOf(e.getId()),
-                 e.getProject().getProjectName(),
-                 e.getDateEnquired().toString(),
-                 e.getEnquiry() != null ? e.getEnquiry() : "-",
-                 e.getReply() != null ? e.getReply() : "-"
-         ));
-      }
+        for (Application app : applications) {
+            if (app.getApplicationStatus() == ApplicationStatus.PENDING) {
+                return app;
+            }
+        }
 
-      return tableData;
-   }
+        return null; // No pending application found
+    }
+
+    public List<List<String>> getMyEnquiriesAsTableData() {
+        User user = applicantService.getUser();
+        if (!(user instanceof Applicant)) {
+            throw new IllegalStateException("Current user is not an applicant.");
+        }
+
+        List<Enquiry> enquiries = applicantService.getEnquiriesByApplicant((Applicant) user);
+        List<List<String>> tableData = new ArrayList<>();
+
+        // Add header row
+        tableData.add(List.of("ID", "Project", "Date", "Question", "Reply"));
+
+        // Add each enquiry row
+        for (Enquiry e : enquiries) {
+            tableData.add(List.of(
+                    String.valueOf(e.getId()),
+                    e.getProject().getProjectName(),
+                    e.getDateEnquired().toString(),
+                    e.getEnquiry() != null ? e.getEnquiry() : "-",
+                    e.getReply() != null ? e.getReply() : "-"
+            ));
+        }
+
+        return tableData;
+    }
 
 
 }
