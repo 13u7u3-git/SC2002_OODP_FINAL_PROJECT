@@ -7,6 +7,8 @@ import interfaces.AbstractMenu;
 import project.FlatType;
 import project.Project;
 import system.SessionManager;
+import user.User;
+import user.UserFilterSettings;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -88,66 +90,73 @@ Please enter your choice:""", Color.CYAN);
             return;
          }
 
-         Color.println("--- All Projects ---", Color.YELLOW);
-         printProjectsTable(allProjects);
+         User currentUser = sessionManager.getCurrentUser();
+         UserFilterSettings filters = currentUser.getFilterSettings();
 
-         Scanner sc = new Scanner(System.in);
-         Color.println("\nWould you like to filter the projects? (yes/no)", Color.CYAN);
-         String filterChoice = sc.nextLine().trim().toLowerCase();
-         if (!filterChoice.equals("yes")) return;
+         // Step 1: Inform if filters are currently set
+         boolean hasFilters = filters.getProjectName() != null || filters.getNeighbourhood() != null ||
+                 filters.getFlatType() != null || filters.getDate() != null;
 
-         Color.println("Choose a filter option:", Color.CYAN);
-         Color.println("1. Project Name", Color.YELLOW);
-         Color.println("2. Neighbourhood", Color.YELLOW);
-         Color.println("3. Flat Type", Color.YELLOW);
-         Color.println("4. Date", Color.YELLOW);
-         Color.print("Enter your choice (1-4): ", Color.CYAN);
-         int choice = Integer.parseInt(sc.nextLine().trim());
-
-         Predicate<Project> filter = p -> true;
-         switch (choice) {
-            case 1:
-               Color.print("Enter project name: ", Color.CYAN);
-               String name = sc.nextLine().trim().toLowerCase();
-               filter = p -> p.getProjectName().toLowerCase().contains(name);
-               break;
-
-            case 2:
-               Color.print("Enter neighbourhood: ", Color.CYAN);
-               String hood = sc.nextLine().trim().toLowerCase();
-               filter = p -> p.getNeighborhood().toLowerCase().contains(hood);
-               break;
-
-            case 3:
-               try {
-                  Color.print("Enter flat type (TWO_ROOM / THREE_ROOM): ", Color.CYAN);
-                  String type = sc.nextLine().trim().toUpperCase();
-                  FlatType flatType = FlatType.valueOf(type);
-                  filter = p -> p.getAvailableFlats().getOrDefault(flatType, 0) > 0;
-               } catch (IllegalArgumentException e) {
-                  Color.println("Invalid flat type.", Color.RED);
-                  return;
-               }
-               break;
-
-            case 4:
-               try {
-                  Color.print("Enter date (yyyy-mm-dd): ", Color.CYAN);
-                  LocalDate inputDate = LocalDate.parse(sc.nextLine().trim());
-                  filter = p -> !inputDate.isBefore(p.getApplicationOpeningDate()) &&
-                          !inputDate.isAfter(p.getApplicationClosingDate());
-               } catch (Exception e) {
-                  Color.println("Invalid date format.", Color.RED);
-                  return;
-               }
-               break;
-
-            default:
-               Color.println("Invalid choice.", Color.RED);
-               return;
+         if (hasFilters) {
+            Color.println("Active filters are applied.", Color.YELLOW);
          }
 
-         List<Project> filtered = allProjects.stream().filter(filter).collect(Collectors.toList());
+         // Step 2: Ask if user wants to update/reset
+         Color.println("\nWould you like to update/reset the filters? (yes/no/reset)", Color.CYAN);
+         String filterChoice = scanner.nextLine().trim().toLowerCase();
+
+         if (filterChoice.equals("reset")) {
+            filters.reset();
+         } else if (filterChoice.equals("yes")) {
+            while (true) {
+               Color.println("\nChoose a filter to set/update:", Color.CYAN);
+               Color.println("1. Project Name", Color.YELLOW);
+               Color.println("2. Neighbourhood", Color.YELLOW);
+               Color.println("3. Flat Type", Color.YELLOW);
+               Color.println("4. Date", Color.YELLOW);
+               Color.println("5. Done", Color.YELLOW);
+               Color.print("Enter your choice (1-5): ", Color.CYAN);
+               int choice = Integer.parseInt(scanner.nextLine().trim());
+
+               switch (choice) {
+                  case 1 -> {
+                     Color.print("Enter project name: ", Color.CYAN);
+                     filters.setProjectName(scanner.nextLine().trim().toLowerCase());
+                  }
+                  case 2 -> {
+                     Color.print("Enter neighbourhood: ", Color.CYAN);
+                     filters.setNeighbourhood(scanner.nextLine().trim().toLowerCase());
+                  }
+                  case 3 -> {
+                     try {
+                        Color.print("Enter flat type (TWO_ROOM / THREE_ROOM): ", Color.CYAN);
+                        filters.setFlatType(FlatType.valueOf(scanner.nextLine().trim().toUpperCase()));
+                     } catch (IllegalArgumentException e) {
+                        Color.println("Invalid flat type.", Color.RED);
+                     }
+                  }
+                  case 4 -> {
+                     try {
+                        Color.print("Enter date (yyyy-mm-dd): ", Color.CYAN);
+                        filters.setDate(LocalDate.parse(scanner.nextLine().trim()));
+                     } catch (Exception e) {
+                        Color.println("Invalid date format.", Color.RED);
+                     }
+                  }
+                  case 5 -> {
+                  }
+                  default -> {
+                     Color.println("Invalid choice.", Color.RED);
+                  }
+               }
+               if (choice == 5) break;
+            }
+         }
+
+         // Step 3: Apply filters
+         Predicate<Project> combinedFilter = getProjectPredicate(filters);
+
+         List<Project> filtered = allProjects.stream().filter(combinedFilter).collect(Collectors.toList());
 
          if (filtered.isEmpty()) {
             Color.println("No projects match your filter.", Color.RED);
@@ -160,6 +169,25 @@ Please enter your choice:""", Color.CYAN);
          Color.println("Error: " + e.getMessage(), Color.RED);
       }
    }
+
+   private static Predicate<Project> getProjectPredicate(UserFilterSettings filters) {
+      Predicate<Project> combinedFilter = p -> true;
+
+      if (filters.getProjectName() != null)
+         combinedFilter = combinedFilter.and(p -> p.getProjectName().toLowerCase().contains(filters.getProjectName()));
+
+      if (filters.getNeighbourhood() != null)
+         combinedFilter = combinedFilter.and(p -> p.getNeighborhood().toLowerCase().contains(filters.getNeighbourhood()));
+
+      if (filters.getFlatType() != null)
+         combinedFilter = combinedFilter.and(p -> p.getAvailableFlats().getOrDefault(filters.getFlatType(), 0) > 0);
+
+      if (filters.getDate() != null)
+         combinedFilter = combinedFilter.and(p -> !filters.getDate().isBefore(p.getApplicationOpeningDate()) &&
+                 !filters.getDate().isAfter(p.getApplicationClosingDate()));
+      return combinedFilter;
+   }
+
 
    public void printProjectsTable(List<Project> projects) {
       Integer COLUMN_WIDTH = 15;
