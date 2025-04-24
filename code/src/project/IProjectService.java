@@ -49,4 +49,6 @@ public interface IProjectService {
    List<List<String>> getAllEnquiriesFromAllProjects();
 
    void addApplicationToProject(Application application);
+
+   void updateProject(Project project, FlatType flatType);
 }

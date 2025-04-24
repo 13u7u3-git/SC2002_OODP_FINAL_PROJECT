@@ -1,5 +1,7 @@
 package applicant;
 
+import enquiry.Enquiry;
+import enquiry.EnquiryService;
 import helper.Color;
 import helper.TablePrinter;
 import interfaces.Menu;
@@ -18,6 +20,7 @@ public class ApplicantMenu extends Menu {
    private final ApplicantController applicantController;
    private final UserFilterManager userFilterManager;
    private final Scanner scanner;
+   private final EnquiryService enquiryService = ServiceRegistry.get(EnquiryService.class);
 
    //scanner, tablePrinter, sessionManager, applicantController
    public ApplicantMenu(Scanner scanner, TablePrinter tablePrinter, SessionManager sessionManager,
@@ -44,45 +47,44 @@ public class ApplicantMenu extends Menu {
 
    @Override
    public void handleInput() {
-      while (true) {  // Keep asking until valid input
-         try {
-            String input = scanner.nextLine().trim();
+      // Keep asking until valid input
+      try {
+         String input = scanner.nextLine().trim();
 
-            // Check if input is a single digit (0-9)
-            if (!input.matches("[0-9]")) {
-               Color.println("Error: Please enter a digit (0-9)", Color.RED);
-               continue;  // Skip to next iteration (ask again)
+         // Check if input is a single digit (0-9)
+         if (!input.matches("[0-9]")) {
+            Color.println("Error: Please enter a digit (0-9)", Color.RED);
+         }
+
+         // Process valid input
+         switch (input) {
+            case "1" -> handleViewAvailableProjects();
+            case "2" -> handleApplyForBTOProject();
+            case "3" -> handleViewApplicationStatus();
+            case "4" -> handleRequestWithdrawal();
+            case "5" -> handleSubmitEnquiry();
+            case "6" -> handleViewMyEnquiries();
+            case "7" -> handleEditEnquiry();
+            case "8" -> handleDeleteEnquiry();
+            case "9" -> handleChangePassword();
+            case "0" -> {
+               sessionManager.logout();
+               return;  // Exit the loop after logout
             }
+            // Add a default case for unexpected valid digits if needed
+            default -> Color.println("Invalid choice. Please enter a number between 0 and 9.", Color.RED);
+         }
 
-            // Process valid input
-            switch (input) {
-               case "1" -> handleViewAvailableProjects();
-               case "2" -> handleApplyForBTOProject();
-               case "3" -> handleViewApplicationStatus();
-               case "4" -> handleRequestWithdrawal();
-               case "5" -> handleSubmitEnquiry();
-               case "6" -> handleViewMyEnquiries();
-               case "7" -> handleEditEnquiry();
-               case "8" -> handleDeleteEnquiry();
-               case "9" -> handleChangePassword();
-               case "0" -> {
-                  sessionManager.logout();
-                  return;  // Exit the loop after logout
-               }
-               // Add a default case for unexpected valid digits if needed
-               default -> Color.println("Invalid choice. Please enter a number between 0 and 9.", Color.RED);
-            }
-
-         }
-         catch (NoSuchElementException e) {
-            Color.println("Error: Input stream closed", Color.RED);
-            return;
-         }
-         catch (IllegalStateException e) {
-            Color.println("Error: Scanner is closed", Color.RED);
-            return;
-         }
       }
+      catch (NoSuchElementException e) {
+         Color.println("Error: Input stream closed", Color.RED);
+         return;
+      }
+      catch (IllegalStateException e) {
+         Color.println("Error: Scanner is closed", Color.RED);
+         return;
+      }
+
    }
 
    public void handleViewAvailableProjects() {
@@ -433,7 +435,7 @@ public class ApplicantMenu extends Menu {
 
 
    public void handleEditEnquiry() {
-     /* try {
+      try {
          List<Enquiry> enquiries = applicantController.getMyEnquiries();
          // Filter directly here for better user experience
          List<Enquiry> editableEnquiries = enquiries.stream()
@@ -450,13 +452,27 @@ public class ApplicantMenu extends Menu {
          Enquiry selectedEnquiry = selectEnquiryFromList(editableEnquiries, "edit");
          if (selectedEnquiry == null) {
             // User cancelled selection in helper method
+            Color.println("Selected Enquiry cannot be edited.", Color.YELLOW);
             return;
          }
 
-         // Get new enquiry text
+         /*// Get new enquiry text
          String newEnquiryText = getValidatedEnquiryInput(selectedEnquiry.getEnquiry());
          if (newEnquiryText == null) {
             // User cancelled or input was invalid/unchanged
+            return;
+         }*/
+
+
+         // Get new enquiry text
+         Color.print("Enter new enquiry text (max 200 chars): ", Color.CYAN);
+         String newEnquiryText = scanner.nextLine().trim();
+         if (newEnquiryText.isEmpty()) {
+            Color.println("Enquiry text cannot be empty.", Color.RED);
+            return;
+         }
+         if (newEnquiryText.length() > 200) { // Example length limit
+            Color.println("Enquiry text is too long (max 200 characters). Please try again.", Color.RED);
             return;
          }
 
@@ -479,12 +495,46 @@ public class ApplicantMenu extends Menu {
       catch (Exception e) { // Catch unexpected errors
          Color.println("Unexpected error during enquiry edit: " + e.getMessage(), Color.RED);
          e.printStackTrace(); // For debugging
-      }*/
+      }
    }
 
+   //private methods
+   private Enquiry selectEnquiryFromList(List<Enquiry> enquiries, String action) {
+      Color.println("--- Your Enquiries Available to " + action.toUpperCase() + " ---", Color.YELLOW);
+
+      List<List<String>> tableData = new ArrayList<>();
+      for (Enquiry enquiry : enquiries) {
+         tableData.add(Arrays.asList(
+                 String.valueOf(enquiry.getId()),
+                 enquiry.getProjectName(),
+                 enquiry.getEnquiry(),
+                 enquiry.getReply()
+         ));
+         tableData.add(0, List.of("Enquiry ID", "Project", "Enquiry Text", "Reply"));
+
+         Integer COLUMN_WIDTH = 20; // Adjust width as needed
+         tablePrinter.printTable(COLUMN_WIDTH, tableData);
+         Color.print("Enter the Enquiry ID to " + action + " (or 'C' to cancel): ", Color.CYAN);
+         String input = scanner.nextLine().trim();
+         if (input.equalsIgnoreCase("C")) {
+            return null; // User cancelled
+         }
+         try {
+            int enquiryId = Integer.parseInt(input);
+            return enquiries.stream()
+                    .filter(e -> e.getId() == enquiryId)
+                    .findFirst()
+                    .orElse(null); // Return null if enquiry not found
+         }
+         catch (NumberFormatException e) {
+            Color.println("Invalid input. Please enter a valid Enquiry ID.", Color.RED);
+         }
+      }
+      return null;
+   }
 
    public void handleDeleteEnquiry() {
-      /*try {
+      try {
          List<Enquiry> myEnquiries = applicantController.getMyEnquiries();
          // Filter directly here
          List<Enquiry> deletableEnquiries = myEnquiries.stream()
@@ -504,8 +554,7 @@ public class ApplicantMenu extends Menu {
          }
 
          // Confirmation
-         Color.print("Are you sure you want to permanently delete enquiry ID " + selectedEnquiry.getId() + " for project '"
-                 + (selectedEnquiry.getProject() != null ? selectedEnquiry.getProject().getProjectName() : "N/A") + "'? (Y/N): ", Color.YELLOW);
+         Color.print("Are you sure you want to permanently delete enquiry ID :" + selectedEnquiry.getId(), Color.YELLOW);
          String confirm = scanner.nextLine().trim();
          if (!confirm.equalsIgnoreCase("y")) {
             Color.println("Deletion cancelled.", Color.YELLOW);
@@ -513,15 +562,7 @@ public class ApplicantMenu extends Menu {
          }
 
          // Call controller
-         boolean success = applicantController.deleteEnquiryIfAllowed(selectedEnquiry);
-         if (success) {
-            Color.println("Enquiry ID " + selectedEnquiry.getId() + " deleted successfully.", Color.GREEN);
-         }
-         else {
-            // This might happen if the enquiry was replied to between listing and deleting (race condition)
-            // Or if the controller logic has further checks.
-            Color.println("Enquiry could not be deleted. It might have been replied to recently, or another issue occurred.", Color.RED);
-         }
+         enquiryService.deleteEnquiry(selectedEnquiry);
 
       }
       catch (IllegalArgumentException e) { // Catch errors from controller
@@ -530,7 +571,7 @@ public class ApplicantMenu extends Menu {
       catch (Exception e) { // Catch unexpected errors
          Color.println("Unexpected error during enquiry deletion: " + e.getMessage(), Color.RED);
          e.printStackTrace(); // For debugging
-      }*/
+      }
    }
 
    public void handleChangePassword() {

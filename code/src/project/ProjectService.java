@@ -150,7 +150,14 @@ public class ProjectService implements IProjectService {
    @Override
    public void addApplicationToProject(Application application) {
       Project project = getProjectById(application.getProjectId());
+      System.out.println("Adding application to project: " + project.getProjectName());
       project.addApplication(application);
+   }
+
+   @Override
+   public void updateProject(Project project, FlatType flatType) {
+      Project existingProject = getProjectById(project.getId());
+      existingProject.decrementRemainingFlat(flatType);
    }
 
 

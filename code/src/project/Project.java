@@ -215,6 +215,33 @@ public class Project implements Serializable {
    }
 
 
+   public void decrementRemainingFlat(FlatType flatType) {
+      Integer currentCount = remainingFlats.get(flatType);
+      if (currentCount == null || currentCount <= 0) {
+         throw new IllegalStateException("No remaining " + flatType + " flats available");
+      }
+      remainingFlats.put(flatType, currentCount - 1);
+   }
+
+   /**
+    * Decrements the number of remaining two-room flats by one.
+    *
+    * @throws IllegalStateException if there are no remaining two-room flats
+    */
+   public void decrementRemainingTwoRoomFlat() {
+      decrementRemainingFlat(FlatType.TWO_ROOM);
+   }
+
+   /**
+    * Decrements the number of remaining three-room flats by one.
+    *
+    * @throws IllegalStateException if there are no remaining three-room flats
+    */
+   public void decrementRemainingThreeRoomFlat() {
+      decrementRemainingFlat(FlatType.THREE_ROOM);
+   }
+
+
 }
 
 

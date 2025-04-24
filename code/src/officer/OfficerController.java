@@ -1,5 +1,6 @@
 package officer;
 
+import enquiry.Enquiry;
 import helper.Color;
 import project.IProjectService;
 import project.Project;
@@ -117,5 +118,29 @@ public class OfficerController {
       officerService.changePassword(oldPassword, newPassword, confirmPassword);
    }
 
+   public List<List<String>> getProjectEnquiriesTableData() {
+      List<Enquiry> enquiries = officerService.getCurrentProject().getEnquiries();
+      if (enquiries.isEmpty()) {
+         return null;
+      }
+      List<String> headerRow = List.of("Enquiry ID", "Project ID", "Project Name", "Officer ID", "Officer Name", "Message", "Date");
+      List<List<String>> tableData = new ArrayList<>();
+      tableData.add(headerRow);
+      for (Enquiry enquiry : enquiries) {
+         List<String> fromEnquiry = enquiry.toStringList();
+         tableData.add(fromEnquiry);
+      }
+      return tableData;
+   }
+
+   public boolean replyToProjectEnquiry(String enquiryId, String reply) {
+      Project project = officerService.getCurrentProject();
+      Enquiry enquiry = project.getEnquiries().stream().filter(x -> x.getId().equals(Integer.parseInt(enquiryId))).findFirst().get();
+      if (enquiry == null) {
+         return false;
+      }
+      enquiry.setReply(reply);
+      return true;
+   }
 }
 

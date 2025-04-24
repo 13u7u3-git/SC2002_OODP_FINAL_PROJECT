@@ -1,5 +1,6 @@
 package officer;
 
+import applicant.Application;
 import project.Project;
 import user.IUserService;
 
@@ -27,6 +28,8 @@ public interface IOfficerService extends IUserService {
    void setUser(Officer officer);
 
    void setOfficerCurrentProject(String officerName, Project currentProject);
+
+   void bookFlat(Application application);
 
 
    // Application Management

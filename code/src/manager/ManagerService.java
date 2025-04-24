@@ -1,5 +1,7 @@
 package manager;
 
+import applicant.ApplicationStatus;
+import applicant.WithdrawalRequestStatus;
 import enquiry.Enquiry;
 import interfaces.StaffService;
 import officer.IOfficerService;
@@ -150,6 +152,42 @@ public class ManagerService implements IManagerService, StaffService {
       String[] officerArr = officerStr.split(",");
       for (String officer : officerArr) {
          project.getOfficers().add(officer);
+      }
+   }
+
+   @Override
+   public void updateApplicationStatus(String applicationId, ApplicationStatus status) throws Exception {
+      try {
+         manager.getCurrentProject().getApplications().stream().filter(x -> x.getId().equals(Integer.parseInt(applicationId))).findFirst().get().setStatus(status);
+      }
+      catch (Exception e) {
+         throw new Exception("Application not found: " + e.getMessage());
+      }
+   }
+
+   @Override
+   public List<Enquiry> getProjectEnquiries() {
+      return manager.getCurrentProject().getEnquiries();
+   }
+
+   @Override
+   public boolean replyToProjectEnquiry(String enquiryId, String reply) {
+      Project project = manager.getCurrentProject();
+      Enquiry enquiry = project.getEnquiries().stream().filter(x -> x.getId().equals(Integer.parseInt(enquiryId))).findFirst().get();
+      if (enquiry == null) {
+         return false;
+      }
+      enquiry.setReply(reply);
+      return true;
+   }
+
+   @Override
+   public void updateWithdrawalRequestStatus(String withdrawalRequestId, WithdrawalRequestStatus status) throws Exception {
+      try {
+         manager.getCurrentProject().getApplications().stream().filter(x -> x.getId().equals(Integer.parseInt(withdrawalRequestId))).findFirst().get().setWithdrawalRequestStatus(status);
+      }
+      catch (Exception e) {
+         throw new Exception("Application not found: " + e.getMessage());
       }
    }
 

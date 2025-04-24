@@ -4,6 +4,7 @@ import project.FlatType;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Application implements Serializable {
    private final Integer id;
@@ -62,7 +63,7 @@ public class Application implements Serializable {
       return applicationStatus;
    }
 
-   public void setApplicationStatus(ApplicationStatus applicationStatus) {
+   public void setStatus(ApplicationStatus applicationStatus) {
       this.applicationStatus = applicationStatus;
    }
 
@@ -80,8 +81,12 @@ public class Application implements Serializable {
 
    public void setWithdrawalRequestStatus(WithdrawalRequestStatus withdrawalRequestStatus) {
       this.withdrawalRequestStatus = withdrawalRequestStatus;
-   /*@Override
-   String toString() {
+
+   }
+
+
+   @Override
+   public String toString() {
       return "============== Application ==============\n" +
               "Application ID        : " + id + "\n" +
               "Applicant Name        : " + applicantName + "\n" +
@@ -94,7 +99,19 @@ public class Application implements Serializable {
               "Withdrawal Request Status : " + withdrawalRequestStatus + "\n" +
               "Date Applied         : " + dateApplied + "\n" +
               "==============================================";
-   }*/
-
    }
+
+   //only this in this order : "Application ID", "Applicant Name", "NRIC", "Flat Type", "Project ID", "Project Name", "Status"
+   public List<String> toList() {
+      return List.of(
+              id.toString(),
+              applicantName,
+              applicantNric,
+              flatType.toString(),
+              projectId.toString(),
+              projectName,
+              applicationStatus.toString()
+      );
+   }
+
 }

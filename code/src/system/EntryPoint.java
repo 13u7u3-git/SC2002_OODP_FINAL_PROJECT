@@ -59,8 +59,19 @@ public class EntryPoint {
                currentMenu = new ManagerMenu(scanner, tablePrinter, sessionManager, managerController);
             }
             else if (user instanceof Officer) {
-               officerService.setUser((Officer) user);
-               currentMenu = new OfficerMenu(scanner, tablePrinter, sessionManager, officerController);
+               Color.println("Officer logged in.", Color.GREEN);
+               Color.println("Choose to be Applicant or officer:");
+
+               // surround using try and catch, and then the user will input 1 or 2 to choose between applicant or officer. if he choose applicabnt tthen we will wrap current user as applicant and run the appklicant menu. if he choose officer then we will wrap current user as officer and run the officer menu.
+               String input = scanner.nextLine();
+               if (input.equals("1")) {
+                  applicantService.setUser((Applicant) user);
+                  currentMenu = new ApplicantMenu(scanner, tablePrinter, sessionManager, applicantController);
+               }
+               else {
+                  officerService.setUser((Officer) user);
+                  currentMenu = new OfficerMenu(scanner, tablePrinter, sessionManager, officerController);
+               }
             }
             else if (user instanceof Applicant) {
                applicantService.setUser((Applicant) user);

@@ -36,4 +36,9 @@ public class Applicant extends User {
    public void setBookedFlatType(FlatType bookedFlatType) {
       this.bookedFlatType = bookedFlatType;
    }
+
+   @Override
+   public int getAge() {
+      return super.getAge();
+   }
 }

@@ -11,6 +11,7 @@ import system.ServiceRegistry;
 import system.SessionManager;
 import user.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -54,7 +55,7 @@ public class ApplicantController {
       // This is a simple way to handle concurrency, though not foolproof.
       // A more robust solution might involve database transactions or synchronized blocks
       // if high concurrency is expected.
-      project.getRemainingFlats().computeIfPresent(flatType, (key, value) -> value > 0 ? value - 1 : 0);
+      //project.getRemainingFlats().computeIfPresent(flatType, (key, value) -> value > 0 ? value - 1 : 0);
 
       projectService.addApplicationToProject(application); // Adds to project's list
       applicantService.addApplicationToApplicant(application); // Adds to applicant's list
@@ -75,41 +76,38 @@ public class ApplicantController {
    }
 
    public void submitEnquiry(int projectId, String enquiryText) {
-    /*  Applicant applicant = (Applicant) sessionManager.getCurrentUser();
+      Applicant applicant = (Applicant) sessionManager.getCurrentUser();
       Project project = projectService.getProjectById(projectId);
       if (project == null) {
          throw new IllegalArgumentException("Project not found.");
       }
 
-      int enquiryId = uniqueIdService.generateUniqueId(IdType.);
-      Enquiry enquiry = enquiryService.createEnquiry(enquiryId, project, applicant, enquiryText);
-      enquiryService.submitEnquiry(enquiry);*/
+
+      Enquiry enquiry = enquiryService.createEnquiry(projectId, applicant.getName(), applicant.getNric(), enquiryText);
+      enquiryService.submitEnquiry(enquiry);
    }
 
 
    public List<Enquiry> getMyEnquiries() {
-     /* Applicant applicant = (Applicant) sessionManager.getCurrentUser();
-      return enquiryService.getEnquiriesForApplicant(applicant);*/
-      return null;
+      Applicant applicant = (Applicant) sessionManager.getCurrentUser();
+      return applicant.getEnquiries();
    }
 
    public void editEnquiry(Enquiry enquiry, String newEnquiryText) {
-      Applicant applicant = (Applicant) sessionManager.getCurrentUser();
+
 
       if (enquiry == null) {
          throw new IllegalArgumentException("Enquiry not found.");
       }
-      // enquiryService.editEnquiry(applicant, enquiry, newEnquiryText);
+      enquiryService.editEnquiry(enquiry, newEnquiryText);
    }
 
    public boolean deleteEnquiryIfAllowed(Enquiry enquiry) {
-      Applicant applicant = (Applicant) sessionManager.getCurrentUser();
 
       if (enquiry == null) {
          throw new IllegalArgumentException("Enquiry not found.");
       }
-
-      //return enquiryService.deleteEnquiry(applicant, enquiry);
+      enquiryService.deleteEnquiry(enquiry);
       return true;
    }
 
@@ -163,12 +161,12 @@ public class ApplicantController {
    }
 
    public List<List<String>> getMyEnquiriesAsTableData() {
-      /*User user = sessionManager.getCurrentUser();
+      User user = sessionManager.getCurrentUser();
       if (!(user instanceof Applicant)) {
          throw new IllegalStateException("Current user is not an applicant.");
       }
 
-      List<Enquiry> enquiries = applicantService.getEnquiriesByApplicant((Applicant) user);
+      List<Enquiry> enquiries = getMyEnquiries();
       List<List<String>> tableData = new ArrayList<>();
 
       // Add header row
@@ -178,14 +176,13 @@ public class ApplicantController {
       for (Enquiry e : enquiries) {
          tableData.add(List.of(
                  String.valueOf(e.getId()),
-                 e.getProject().getProjectName(),
+                 e.getProjectName(),
                  e.getDateEnquired().toString(),
                  e.getEnquiry() != null ? e.getEnquiry() : "-",
                  e.getReply() != null ? e.getReply() : "-"
          ));
       }
-*/
-      return null;
+      return tableData;
    }
 
    public Optional<Project> validateUserApplicationInput(List<Project> eligibleProjects, String input) {

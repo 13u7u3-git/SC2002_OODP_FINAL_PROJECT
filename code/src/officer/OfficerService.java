@@ -2,16 +2,23 @@ package officer;
 
 import UniqueID.IUniqueIdService;
 import UniqueID.IdType;
+import applicant.Application;
+import applicant.ApplicationStatus;
+import applicant.BookingStatus;
 import enquiry.Enquiry;
+import helper.Color;
 import interfaces.StaffService;
+import project.FlatType;
 import project.IProjectService;
 import project.Project;
 import system.ServiceRegistry;
+import system.SessionManager;
 import user.IPasswordValidationService;
 import user.User;
 import user.UserRegistry;
 
 import java.util.List;
+import java.util.Map;
 
 public class OfficerService implements IOfficerService, StaffService {
    private final IProjectService projectService;
@@ -135,6 +142,45 @@ public class OfficerService implements IOfficerService, StaffService {
       UserRegistry userRegistry = ServiceRegistry.get(UserRegistry.class);
       Officer officer = (Officer) userRegistry.getUser(officerName);
       officer.setCurrentProject(currentProject);
+   }
+
+   @Override
+   public void bookFlat(Application application) {
+      Project project = officer.getCurrentProject();
+      if (project == null) {
+         throw new IllegalStateException("You are not assigned to any project.");
+      }
+
+      // Ensure the application is successful
+      if (application.getApplicationStatus() != ApplicationStatus.SUCCESSFUL) {
+         throw new IllegalArgumentException("Only successful applications can be booked.");
+      }
+
+      // Check and decrement flat count
+      FlatType flatType = application.getFlatType();
+      Map<FlatType, Integer> remainingFlats = project.getRemainingFlats();
+
+      if (!remainingFlats.containsKey(flatType) || remainingFlats.get(flatType) <= 0) {
+         throw new IllegalStateException("No available " + flatType.toString().toLowerCase().replace("_", "-") + " flats left.");
+      }
+
+      remainingFlats.put(flatType, remainingFlats.get(flatType) - 1);
+
+      // Update project and application
+      projectService.updateProject(project, flatType);
+      application.setBookingStatus(BookingStatus.BOOKED);
+      //projectService.updateApplicationStatus(application);
+
+
+      // Generate and print receipt
+      Color.println("=== Booking Receipt ===", Color.GREEN);
+      Color.println("Applicant Name   : " + application.getApplicantName(), Color.CYAN);
+      Color.println("NRIC             : " + application.getApplicantNric(), Color.CYAN);
+      Color.println("Age              : " + ((ServiceRegistry.get(SessionManager.class).getUserByName(application.getApplicantName()))).getAge(), Color.CYAN);
+      Color.println("Marital Status   : " + ((ServiceRegistry.get(SessionManager.class).getUserByName(application.getApplicantName()))).getMaritalStatus(), Color.CYAN);
+      Color.println("Flat Type Booked : " + flatType, Color.CYAN);
+      Color.println("Project Name     : " + project.getProjectName(), Color.CYAN);
+      Color.println("=======================", Color.GREEN);
    }
 
    @Override

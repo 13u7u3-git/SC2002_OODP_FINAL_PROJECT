@@ -1,14 +1,22 @@
 package manager;
 
+import applicant.Application;
+import applicant.ApplicationStatus;
+import applicant.WithdrawalRequestStatus;
+import enquiry.Enquiry;
 import officer.RegistrationForm;
 import officer.RegistrationStatus;
+import project.FlatType;
 import project.IProjectService;
 import project.Project;
 import system.ServiceRegistry;
+import system.SessionManager;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ManagerController {
    private final IManagerService managerService;
@@ -151,4 +159,161 @@ public class ManagerController {
    public String getCurrentProjectData() {
       return managerService.getCurrentProject() != null ? managerService.getCurrentProject().toString() : null;
    }
+
+   public List<List<String>> getApplicantApplicationsTableData() throws Exception {
+      Project project = managerService.getCurrentProject();
+      if (project == null) {
+         throw new Exception("No project is under your management");
+      }
+      List<List<String>> tableData = new ArrayList<>();
+      List<String> headerRow = List.of("Application ID", "Applicant Name", "NRIC", "Flat Type", "Project ID", "Project Name", "Status");
+      tableData.add(headerRow);
+      List<Application> applications = project.getApplications();
+      for (Application application : applications) {
+         List<String> fromApplication = application.toList();
+         tableData.add(fromApplication);
+      }
+      return tableData;
+   }
+
+   public Boolean approveOrRejectApplicantApplication(String applicationId, boolean isApproved) throws Exception {
+      ApplicationStatus status = (isApproved) ? ApplicationStatus.SUCCESSFUL : ApplicationStatus.REJECTED;
+      managerService.updateApplicationStatus(applicationId, status);
+      return true;
+   }
+
+   public void handlePasswordChange(String oldPass, String newPass1, String newPass2) {
+      managerService.changePassword(oldPass, newPass1, newPass2); // Uses IUserService default
+   }
+
+   public List<List<String>> getProjectEnquiriesTableData() {
+      // TODO: Implement this method
+
+
+      List<Enquiry> enquiries = managerService.getProjectEnquiries();
+      if (enquiries.isEmpty()) {
+         return null;
+      }
+      List<String> headerRow = List.of("Enquiry ID", "Project ID", "Project Name", "Officer ID", "Officer Name", "Message", "Date");
+      List<List<String>> tableData = new ArrayList<>();
+      tableData.add(headerRow);
+      for (Enquiry enquiry : enquiries) {
+         List<String> fromEnquiry = enquiry.toStringList();
+         tableData.add(fromEnquiry);
+      }
+      return tableData;
+   }
+
+   public boolean replyToProjectEnquiry(String enquiryId, String reply) {
+      return managerService.replyToProjectEnquiry(enquiryId, reply);
+   }
+
+   public List<List<String>> getWithdrawalRequestsTableData() throws Exception {
+      List<Application> wr = managerService.getCurrentProject().getApplications().stream()
+              .filter(a -> a.getWithdrawalRequestStatus().equals(WithdrawalRequestStatus.PENDING))
+              .toList();
+      List<List<String>> tableData = new ArrayList<>();
+      List<String> headerRow = List.of("Application ID", "Applicant Name", "NRIC", "Flat Type", "Project ID", "Project Name", "Status");
+      tableData.add(headerRow);
+      for (Application application : wr) {
+         List<String> fromApplication = application.toList();
+         tableData.add(fromApplication);
+      }
+      return tableData;
+   }
+
+   public boolean approveOrRejectWithdrawalRequest(String withdrawalRequestId, boolean isApproved) throws Exception {
+      WithdrawalRequestStatus status = (isApproved) ? WithdrawalRequestStatus.APPROVED : WithdrawalRequestStatus.REJECTED;
+      managerService.updateWithdrawalRequestStatus(withdrawalRequestId, status);
+      return true;
+   }
+
+
+   public List<List<String>> generateApplicantReport(Map<String, String> filters) throws Exception {
+      Project currentProject = managerService.getCurrentProject();
+      if (currentProject == null) {
+         throw new Exception("No project is currently selected");
+      }
+
+      List<Application> applications = currentProject.getApplications();
+      if (applications == null || applications.isEmpty()) {
+         return null;
+      }
+
+      // Filter applications based on criteria
+      List<Application> filteredApplications = applications;
+
+      if (filters != null) {
+         String filterType = filters.get("filterType");
+
+         if (filterType != null) {
+            switch (filterType) {
+               case "flatType" -> {
+                  String flatTypeValue = filters.get("value");
+                  FlatType flatType = FlatType.valueOf(flatTypeValue);
+                  filteredApplications = applications.stream()
+                          .filter(app -> app.getFlatType().equals(flatType))
+                          .collect(Collectors.toList());
+               }
+               case "project" -> {
+                  // If filtering by project and we're already in a specific project context,
+                  // we can either keep all applications or check if the project ID matches
+                  String projectId = filters.get("value");
+                  if (!currentProject.getId().toString().equals(projectId)) {
+                     // If requested project is different from current project, return empty
+                     return null;
+                  }
+               }
+               case "maritalStatus" -> {
+                  String maritalStatusValue = filters.get("value");
+                  filteredApplications = applications.stream()
+                          .filter(app -> (ServiceRegistry.get(SessionManager.class).getUserByName(app.getApplicantName())).getMaritalStatus().toString().equals(maritalStatusValue))
+                          .collect(Collectors.toList());
+               }
+               case "ageRange" -> {
+                  int minAge = Integer.parseInt(filters.get("minAge"));
+                  int maxAge = Integer.parseInt(filters.get("maxAge"));
+                  filteredApplications = applications.stream()
+                          .filter(app -> {
+                             int age = ((ServiceRegistry.get(SessionManager.class).getUserByName(app.getApplicantName()))).getAge();
+                             return age >= minAge && age <= maxAge;
+                          })
+                          .collect(Collectors.toList());
+               }
+            }
+         }
+      }
+
+      // Create report data
+      List<List<String>> reportData = new ArrayList<>();
+      List<String> headerRow = List.of(
+              "Application ID",
+              "Applicant Name",
+              "NRIC",
+              "Age",
+              "Marital Status",
+              "Flat Type",
+              "Project ID",
+              "Project Name",
+              "Status"
+      );
+      reportData.add(headerRow);
+
+      for (Application app : filteredApplications) {
+         List<String> row = new ArrayList<>();
+         row.add(app.getId().toString());
+         row.add(app.getApplicantName());
+         row.add(app.getApplicantNric());
+         row.add(String.valueOf(((ServiceRegistry.get(SessionManager.class).getUserByName(app.getApplicantName()))).getAge()));
+         row.add(((ServiceRegistry.get(SessionManager.class).getUserByName(app.getApplicantName()))).getMaritalStatus().toString());
+         row.add(app.getFlatType().toString());
+         row.add(currentProject.getId().toString());
+         row.add(currentProject.getProjectName());
+         row.add(((ServiceRegistry.get(SessionManager.class).getUserByName(app.getApplicantName()))).toString());
+         reportData.add(row);
+      }
+
+      return reportData;
+   }
+
 }

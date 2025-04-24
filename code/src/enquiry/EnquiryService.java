@@ -24,7 +24,7 @@ public class EnquiryService {
       this.sessionManager = ServiceRegistry.get(SessionManager.class);
    }
 
-   public Enquiry createEnquiry(Integer projectId, String applicantName, Integer applicantNric, String message)
+   public Enquiry createEnquiry(Integer projectId, String applicantName, String applicantNric, String message)
            throws IllegalArgumentException {
       try {
          Project project = projectService.getProjectById(projectId).isVisibility() ?
@@ -92,7 +92,7 @@ public class EnquiryService {
 
    public void replyToEnquiry(Enquiry enquiry, String reply) {
       if (enquiry.getReply() == null || enquiry.getReply().isEmpty()) {
-         enquiry.setReply(reply, sessionManager.getCurrentUser());
+         enquiry.setReply(reply);
          Color.println("Enquiry replied successfully.", Color.GREEN);
       }
       else {
@@ -168,4 +168,6 @@ public class EnquiryService {
 
       return enquiries;
    }
+
+
 }

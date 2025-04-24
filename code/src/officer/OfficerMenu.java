@@ -1,12 +1,17 @@
 package officer;
 
+import applicant.Application;
+import applicant.ApplicationStatus;
 import helper.Color;
 import helper.TablePrinter;
 import interfaces.Menu;
+import project.IProjectService;
 import project.Project;
+import system.ServiceRegistry;
 import system.SessionManager;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class OfficerMenu extends Menu {
@@ -28,13 +33,12 @@ public class OfficerMenu extends Menu {
    protected void display() {
       Color.print("========== HDB Officer Menu ==========\n" +
               "1. View All Projects\n" +
-              "2. Apply for BTO Project\n" +
-              "3. Register as Officer for Project\n" +
-              "4. View Officer Registration Status\n" +
-              "5. View Details of Handled Project\n" +
-              "6. View and Reply to Project Enquiries\n" +
-              "7. Manage Flat Selection/Booking for Applicants\n" +
-              "8. Change Password\n" +
+              "2. Register as Officer for Project\n" +
+              "3. View Officer Registration Status\n" +
+              "4. View Details of Handled Project\n" +
+              "5. View and Reply to Project Enquiries\n" +
+              "6. Manage Flat Selection/Booking for Applicants\n" +
+              "7. Change Password\n" +
               "0. Logout\n" +
               "======================================\n" +
               "Please enter your choice:", Color.CYAN);
@@ -44,13 +48,12 @@ public class OfficerMenu extends Menu {
       String input = scanner.nextLine();
       switch (input) {
          case "1" -> handleViewAllProjects();
-         case "2" -> handleApplyForBTOProject(); // TODO: not yet
-         case "3" -> handleRegisterAsOfficer();
-         case "4" -> handleViewOfficerRegistrationStatus();
-         case "5" -> handleViewHandledProjectDetails();
-         case "6" -> handleViewAndReplyToEnquiries(); // TODO: after applicant enquiry logic
-         case "7" -> handleManageFlatSelection(); // TODO: after applicant flat selection logic
-         case "8" -> handleChangePassword();
+         case "2" -> handleRegisterAsOfficer();
+         case "3" -> handleViewOfficerRegistrationStatus();
+         case "4" -> handleViewHandledProjectDetails();
+         case "5" -> handleViewAndReplyToEnquiries();
+         case "6" -> handleManageFlatSelection(); //
+         case "7" -> handleChangePassword();
          case "0" -> {
             sessionManager.logout();
          }
@@ -193,14 +196,106 @@ public class OfficerMenu extends Menu {
 
    }
 
+   private void handleViewAllProjectEnquiries() {
+      try {
+         List<List<String>> tableData = officerController.getProjectEnquiriesTableData();
+         if (tableData == null || tableData.isEmpty()) {
+            Color.println("No project enquiries.", Color.RED);
+            return;
+         }
+         Integer COLUMN_WIDTH = 15;
+         Color.println("--- Viewing Project Enquiries ---", Color.YELLOW);
+         tablePrinter.printTable(COLUMN_WIDTH, tableData);
+      }
+      catch (Exception e) {
+         Color.println("Error viewing project enquiries.\nPossible Reason:" + e.getMessage(), Color.RED);
+      }
+   }
+
+   private void handleReplyToProjectEnquiries() {
+      try {
+         handleViewAllProjectEnquiries();
+         Color.print("Enter Enquiry ID to reply:", Color.GREEN);
+         String enquiryId = scanner.nextLine();
+         Color.print("Enter Reply:", Color.GREEN);
+         String reply = scanner.nextLine();
+         boolean success = officerController.replyToProjectEnquiry(enquiryId, reply);
+         if (success) {
+            Color.println("Reply sent successfully!", Color.GREEN);
+         }
+         else {
+            Color.println("Failed to send reply. Enquiry may not exist or already processed. Check the Enquiry ID.", Color.RED);
+         }
+      }
+      catch (Exception e) {
+         Color.println("Error processing project enquiry: " + e.getMessage(), Color.RED);
+      }
+
+   }
+
+
    private void handleViewAndReplyToEnquiries() {
       Color.println("Viewing and Replying to Project Enquiries", Color.GREEN);
       // Implement logic to view and reply to project enquiries
    }
 
    private void handleManageFlatSelection() {
-      Color.println("Managing Flat Selection/Booking for Applicants", Color.GREEN);
-      // Implement logic to manage flat selection/booking for applicants
+      try {
+
+         IProjectService projectService = ServiceRegistry.get(IProjectService.class);
+         IOfficerService officerService = ServiceRegistry.get(IOfficerService.class);
+         SessionManager sessionManager = ServiceRegistry.get(SessionManager.class);
+         Project current = officerService.getCurrentProject();
+         if (current == null) {
+            Color.println("You are not assigned to any project.", Color.RED);
+            return;
+         }
+
+         List<Application> apps = projectService.getProjectById(current.getId())
+                 .getApplications().stream()
+                 .filter(a -> a.getApplicationStatus() == ApplicationStatus.SUCCESSFUL)
+                 .toList();
+
+         if (apps.isEmpty()) {
+            Color.println("No approved applications to book.", Color.RED);
+            return;
+         }
+
+         Color.println("--- Approved Applications ---", Color.YELLOW);
+         for (Application a : apps) {
+            Color.println("ID: " + a.getId() + " | " + a.getApplicantName() + " | " + a.getFlatType() + " | " + a.getBookingStatus(), Color.CYAN);
+         }
+
+         //((ServiceRegistry.get(SessionManager.class).getUserByName(app.getApplicantName())))
+         Color.print("Enter Application ID to book flat (0 to cancel): ", Color.CYAN);
+         String input = scanner.nextLine().trim();
+
+         if (input.equals("0")) {
+            Color.println("Booking cancelled.", Color.YELLOW);
+            return;
+         }
+
+         try {
+            int selectedId = Integer.parseInt(input);
+            Optional<Application> selectedApp = apps.stream()
+                    .filter(a -> a.getId() == selectedId)
+                    .findFirst();
+
+            if (selectedApp.isEmpty()) {
+               Color.println("Invalid Application ID.", Color.RED);
+               return;
+            }
+
+            officerService.bookFlat(selectedApp.get());
+            Color.println("Flat booked and receipt generated.", Color.GREEN);
+         }
+         catch (NumberFormatException e) {
+            Color.println("Invalid input. Please enter a valid Application ID.", Color.RED);
+         }
+      }
+      catch (Exception e) {
+         Color.println("Error: " + e.getMessage(), Color.RED);
+      }
    }
 
    private void handleChangePassword() {

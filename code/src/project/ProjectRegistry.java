@@ -67,9 +67,11 @@ public class ProjectRegistry implements Serializable, Filterable<Project> {
                  officerSlots,
                  new ArrayList<>() // empty officer list initially
          );
-
+         project.setVisibility(true);
          projects.add(project);
       }
+      save();
+      System.out.println("Dummy projects created and saved.");
    }
 
    public ProjectRegistry load() {
