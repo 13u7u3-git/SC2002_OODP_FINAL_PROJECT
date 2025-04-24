@@ -1,8 +1,12 @@
 package project;
 
+import UniqueID.IUniqueIdService;
+import UniqueID.IdType;
 import interfaces.Filterable;
+import system.ServiceRegistry;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -19,9 +23,53 @@ public class ProjectRegistry implements Serializable, Filterable<Project> {
       this.projects = new ArrayList<>();
    }
 
+
    // We will always use this because we will always be loading projects from csv.
    public ProjectRegistry(List<Project> projects) {
       this.projects = projects;
+   }
+
+   public void createDummyProjects() {
+      // Clear existing projects to avoid duplicates when called multiple times
+      projects.clear();
+
+      // Create dummy projects with realistic data
+      for (int i = 1; i <= 10; i++) {
+         // Generate project data
+         String projectName = "Project " + i;
+         String neighbourhood = "Neighborhood " + (char) ('A' + (i % 5));
+         int twoRoomUnits = 50 + (i * 10);
+         double twoRoomPrice = 200000 + (i * 25000);
+         int threeRoomUnits = 30 + (i * 5);
+         double threeRoomPrice = 300000 + (i * 30000);
+
+         // Set application dates (opening date is today, closing date is 30 days later)
+         LocalDate today = LocalDate.now();
+         LocalDate applicationOpeningDate = today;
+         LocalDate applicationClosingDate = today.plusDays(30);
+
+         // Manager and officer slots
+         String managerNric = "gg";
+         int officerSlots = 2 + (i % 6);
+
+         // Create project with the generated data
+         Project project = new Project(
+                 ServiceRegistry.get(IUniqueIdService.class).generateUniqueId(IdType.PROJECT_ID), // projectId
+                 projectName,
+                 neighbourhood,
+                 twoRoomUnits,
+                 twoRoomPrice,
+                 threeRoomUnits,
+                 threeRoomPrice,
+                 applicationOpeningDate,
+                 applicationClosingDate,
+                 managerNric,
+                 officerSlots,
+                 new ArrayList<>() // empty officer list initially
+         );
+
+         projects.add(project);
+      }
    }
 
    public ProjectRegistry load() {

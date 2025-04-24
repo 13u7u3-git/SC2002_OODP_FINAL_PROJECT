@@ -160,6 +160,30 @@ public class Project implements Serializable {
       return flatPrices.get(FlatType.THREE_ROOM);
    }
 
+   //Setters
+   public void addEnquiry(Enquiry enquiry) {
+      enquiries.add(enquiry);
+   }
+
+   public void removeEnquiry(Enquiry enquiry) {
+      enquiries.remove(enquiry);
+   }
+
+   public void addApplication(Application application) {
+      applications.add(application);
+   }
+
+   public void removeApplication(Application application) {
+      applications.remove(application);
+   }
+
+   public void addOfficer(String officer) {
+      officers.add(officer);
+   }
+
+   public void removeOfficer(String officer) {
+      officers.remove(officer);
+   }
 
 // =================== Mutable Project Metadata ===================
 

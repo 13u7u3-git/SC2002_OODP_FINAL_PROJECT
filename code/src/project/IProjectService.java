@@ -1,5 +1,7 @@
 package project;
 
+import applicant.Application;
+import enquiry.Enquiry;
 import officer.RegistrationForm;
 
 import java.time.LocalDate;
@@ -37,4 +39,14 @@ public interface IProjectService {
    void validateNewProject(Project project) throws IllegalArgumentException;
 
    void addRegistrationToProject(RegistrationForm form);
+
+   void addEnquiryToProject(Enquiry enquiry);
+
+   void removeEnquiryFromProject(Enquiry enquiry);
+
+   List<List<String>> getEnquiriesFrom(String projectId);
+
+   List<List<String>> getAllEnquiriesFromAllProjects();
+
+   void addApplicationToProject(Application application);
 }

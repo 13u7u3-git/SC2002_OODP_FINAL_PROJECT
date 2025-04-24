@@ -2,6 +2,8 @@ package project;
 
 import UniqueID.IUniqueIdService;
 import UniqueID.IdType;
+import applicant.Application;
+import enquiry.Enquiry;
 import officer.IRegistrationValidationService;
 import officer.RegistrationForm;
 import officer.RegistrationValidationService;
@@ -116,4 +118,40 @@ public class ProjectService implements IProjectService {
       Project project = getProjectById(form.getProjectId());
       project.addRegistrationForm(form);
    }
+
+   @Override
+   public void addEnquiryToProject(Enquiry enquiry) {
+      Project project = getProjectById(enquiry.getProjectId());
+      project.addEnquiry(enquiry);
+   }
+
+   @Override
+   public void removeEnquiryFromProject(Enquiry enquiry) {
+      Project project = getProjectById(enquiry.getProjectId());
+      project.removeEnquiry(enquiry);
+   }
+
+   @Override
+   public List<List<String>> getEnquiriesFrom(String projectId) {
+      return projectRegistry.getProjects().stream()
+              .filter(p -> p.getId().equals(Integer.parseInt(projectId)))
+              .flatMap(p -> p.getEnquiries().stream().map(Enquiry::toStringList))
+              .toList();
+   }
+
+   @Override
+   public List<List<String>> getAllEnquiriesFromAllProjects() {
+      return projectRegistry.getProjects().stream()
+              .flatMap(p -> p.getEnquiries().stream())
+              .map(Enquiry::toStringList)
+              .toList();
+   }
+
+   @Override
+   public void addApplicationToProject(Application application) {
+      Project project = getProjectById(application.getProjectId());
+      project.addApplication(application);
+   }
+
+
 }

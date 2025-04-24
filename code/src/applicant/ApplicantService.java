@@ -9,6 +9,7 @@ import user.IPasswordValidationService;
 import user.User;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class ApplicantService implements IApplicantService {
@@ -50,7 +51,7 @@ public class ApplicantService implements IApplicantService {
       return project -> {
          // Check if applicant has already applied for this project
          boolean hasApplied = project.getApplications().stream()
-                 .anyMatch(app -> app.getApplicant().equals(applicant));
+                 .anyMatch(app -> app.getApplicantName().equals(applicant.getName()));
 
          // If already applied, always show the project
          if (hasApplied) {
@@ -83,5 +84,16 @@ public class ApplicantService implements IApplicantService {
          // Applicants under 21 are not eligible
          return false;
       };
+   }
+
+   @Override
+   public void addApplicationToApplicant(Application application) {
+      // Add the application to the applicant's list of applications
+      applicant.getMyApplications().add(application);
+   }
+
+   @Override
+   public List<Application> getApplicationsByApplicant(Applicant applicant) {
+      return applicant.getMyApplications();
    }
 }

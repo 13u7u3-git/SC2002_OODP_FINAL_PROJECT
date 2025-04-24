@@ -3,6 +3,7 @@ package system;
 import UniqueID.IUniqueIdService;
 import UniqueID.UniqueIdService;
 import applicant.*;
+import enquiry.EnquiryService;
 import helper.Color;
 import helper.TablePrinter;
 import interfaces.Menu;
@@ -11,6 +12,7 @@ import officer.*;
 import project.IProjectService;
 import project.ProjectRegistry;
 import project.ProjectService;
+import project.UserFilterManager;
 import user.IPasswordValidationService;
 import user.PasswordValidationService;
 
@@ -21,7 +23,7 @@ public class EntryPoint {
       boolean running = true; // Flag to control the main loop
       Scanner scanner = new Scanner(System.in);
       TablePrinter tablePrinter = new TablePrinter();
-      Boolean loadFromTxt = true;
+      Boolean loadFromTxt = false;
 
       // Initialize and register all services to ServiceRegistry
       initializeServices(loadFromTxt); // written in the initializeServices method below, to prevent DI boilerplate
@@ -38,6 +40,8 @@ public class EntryPoint {
       // Create login menu
       LoginMenu loginMenu = new LoginMenu(sessionManager, scanner);
       Color.println("Welcome to the BTO System!", Color.CYAN);
+
+      sessionManager.getProjectRegistry().createDummyProjects();
 
       while (running) {
          // Get current menu based on user state
@@ -119,6 +123,9 @@ public class EntryPoint {
       IManagerService managerService = new ManagerService();
       ServiceRegistry.register(IManagerService.class, managerService);
 
+      EnquiryService enquiryService = new EnquiryService();
+      ServiceRegistry.register(EnquiryService.class, enquiryService);
+
       // Create and register controllers
       ApplicantController applicantController = new ApplicantController();
       ServiceRegistry.register(ApplicantController.class, applicantController);
@@ -128,5 +135,9 @@ public class EntryPoint {
 
       ManagerController managerController = new ManagerController();
       ServiceRegistry.register(ManagerController.class, managerController);
+
+      UserFilterManager userFilterManager = new UserFilterManager(new Scanner(System.in));
+      ServiceRegistry.register(UserFilterManager.class, userFilterManager);
+
    }
 }
