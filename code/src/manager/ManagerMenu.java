@@ -194,6 +194,9 @@ public class ManagerMenu extends Menu {
          Color.println("---  All Projects ---", Color.YELLOW);
          Integer COLUMN_WIDTH = 15;
          tablePrinter.printTable(COLUMN_WIDTH, tableData);
+
+
+         // TODO : user filter
       }
       catch (Exception e) {
          Color.println("Error: " + e.getMessage(), Color.RED);

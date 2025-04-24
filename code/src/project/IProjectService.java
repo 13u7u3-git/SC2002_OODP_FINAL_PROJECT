@@ -1,5 +1,7 @@
 package project;
 
+import applicant.Application;
+import enquiry.Enquiry;
 import officer.RegistrationForm;
 
 import java.time.LocalDate;
@@ -10,31 +12,41 @@ import java.util.function.Predicate;
 public interface IProjectService {
 
 
-   Project getProjectById(Integer projectId);
+   String getProjectById(Integer projectId);
 
-   Project getProjectByName(String projectName);
+   String getProjectByName(java.lang.String projectName);
 
-   List<Project> getAllProjects();
-
-
-   public Project createProject(String projectName, String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
-                                Integer threeRoomUnits, Double threeRoomPrice, LocalDate applicationOpeningDate,
-                                LocalDate applicationClosingDate, String manager, Integer availableOfficerSlots,
-                                List<String> officers);
-
-   void deleteProject(Project project);
+   List<String> getAllProjects();
 
 
-   String returnNameIfProjectExists(String projectName);
+   public String createProject(java.lang.String projectName, java.lang.String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
+                               Integer threeRoomUnits, Double threeRoomPrice, LocalDate applicationOpeningDate,
+                               LocalDate applicationClosingDate, java.lang.String manager, Integer availableOfficerSlots,
+                               List<java.lang.String> officers);
 
-   void addProjectToRegistry(Project project);
+   void deleteProject(String project);
 
 
-   void removeProjectFromRegistry(Project project);
+   java.lang.String returnNameIfProjectExists(java.lang.String projectName);
 
-   List<Project> getFilteredProjects(Predicate<Project> predicate);
+   void addProjectToRegistry(String project);
 
-   void validateNewProject(Project project) throws IllegalArgumentException;
+
+   void removeProjectFromRegistry(String project);
+
+   List<String> getFilteredProjects(Predicate<String> predicate);
+
+   void validateNewProject(String project) throws IllegalArgumentException;
 
    void addRegistrationToProject(RegistrationForm form);
+
+   List<List<java.lang.String>> getAllEnquiriesFromAllProjects();
+
+   List<List<java.lang.String>> getEnquiriesFrom(java.lang.String projectId);
+
+   void addEnquiryToProject(Enquiry enquiry);
+
+   void removeEnquiryFromProject(Enquiry enquiry);
+
+   void addApplicationToProject(Application application);
 }

@@ -1,13 +1,22 @@
 package applicant;
 
-import project.Project;
+import enquiry.Enquiry;
+import project.String;
 import user.IUserService;
+import user.User;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 public interface IApplicantService extends IUserService {
 
-   void setUser(Applicant applicant);
+   User getUser();
 
-   Predicate<Project> isEligibleForApplicant(Applicant applicant);
+   void setUser(User applicant);
+
+   Predicate<String> isEligibleForApplicant(Applicant applicant);
+
+   List<Application> getApplicationsByApplicant(Applicant user);
+
+   List<Enquiry> getEnquiriesByApplicant(Applicant user);
 }

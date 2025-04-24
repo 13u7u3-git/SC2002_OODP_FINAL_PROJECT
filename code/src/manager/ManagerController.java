@@ -3,7 +3,7 @@ package manager;
 import officer.RegistrationForm;
 import officer.RegistrationStatus;
 import project.IProjectService;
-import project.Project;
+import project.String;
 import system.ServiceRegistry;
 
 import java.time.LocalDate;
@@ -19,10 +19,10 @@ public class ManagerController {
       this.projectService = ServiceRegistry.get(IProjectService.class);
    }
 
-   public void createProject(String projectName, String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
+   public void createProject(java.lang.String projectName, java.lang.String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
                              Integer threeRoomUnits, Double threeRoomPrice, LocalDate applicationOpeningDate,
-                             LocalDate applicationClosingDate, String manager, Integer availableOfficerSlots,
-                             List<String> officers) throws IllegalArgumentException {
+                             LocalDate applicationClosingDate, java.lang.String manager, Integer availableOfficerSlots,
+                             List<java.lang.String> officers) throws IllegalArgumentException {
 
       managerService.createProject(projectName, neighbourhood,
               twoRoomUnits, twoRoomPrice, threeRoomUnits, threeRoomPrice, applicationOpeningDate, applicationClosingDate, manager, availableOfficerSlots, officers);
@@ -40,36 +40,36 @@ public class ManagerController {
       }
    }
 
-   public List<List<String>> getAllProjectsTableData() throws Exception {
-      List<Project> projects = projectService.getAllProjects();
+   public List<List<java.lang.String>> getAllProjectsTableData() throws Exception {
+      List<String> projects = projectService.getAllProjects();
       if (projects == null || projects.isEmpty()) {
          return null;
       }
       else {
-         List<String> headerRow = List.of("Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers");
-         List<List<String>> tableData = new ArrayList<>();
+         List<java.lang.String> headerRow = List.of("Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers");
+         List<List<java.lang.String>> tableData = new ArrayList<>();
          tableData.add(headerRow);
-         for (Project p : projects) {
-            List<String> fromEachProject = p.toStringAsList();
+         for (String p : projects) {
+            List<java.lang.String> fromEachProject = p.toStringAsList();
             tableData.add(fromEachProject);
          }
          return tableData;
       }
    }
 
-   public List<List<String>> getMyProjectsTableData() {
+   public List<List<java.lang.String>> getMyProjectsTableData() {
 
-      List<Project> myProjects = managerService.getMyProjects();
+      List<String> myProjects = managerService.getMyProjects();
 
       if (myProjects == null || myProjects.isEmpty()) {
          return null;
       }
       else {
-         List<String> headerRow = List.of("Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers");
-         List<List<String>> tableData = new ArrayList<>();
+         List<java.lang.String> headerRow = List.of("Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers");
+         List<List<java.lang.String>> tableData = new ArrayList<>();
          tableData.add(headerRow);
-         for (Project p : myProjects) {
-            List<String> fromRegistration = p.toStringAsList();
+         for (String p : myProjects) {
+            List<java.lang.String> fromRegistration = p.toStringAsList();
             tableData.add(fromRegistration);
          }
          return tableData;
@@ -77,24 +77,24 @@ public class ManagerController {
    }
 
 
-   public Project getProjectById(Integer projectId) {
+   public String getProjectById(Integer projectId) {
       return projectService.getProjectById(projectId);
    }
 
    public boolean toggleVisibility(Integer projectId) {
-      Project project = projectService.getProjectById(projectId);
+      String project = projectService.getProjectById(projectId);
       project.setVisibility(!project.isVisibility());
       return true;
    }
 
-   public void editProject(Integer projectId, String option, Object T) {
-      Project project = projectService.getProjectById(projectId);
+   public void editProject(Integer projectId, java.lang.String option, Object T) {
+      String project = projectService.getProjectById(projectId);
       switch (option) {
          case "1" -> {
-            project.setProjectName((String) T);
+            project.setProjectName((java.lang.String) T);
          }
          case "2" -> {
-            project.setNeighborhood((String) T);
+            project.setNeighborhood((java.lang.String) T);
          }
          case "3" -> {
             project.setApplicationOpeningDate((LocalDate) T);
@@ -111,18 +111,18 @@ public class ManagerController {
       }
    }
 
-   public List<List<String>> getPendingRegistrationTableData() throws Exception {
+   public List<List<java.lang.String>> getPendingRegistrationTableData() throws Exception {
 
       try {
          List<RegistrationForm> pendingRegistrations = managerService.getPendingOfficerRegistrations();
          if (pendingRegistrations.isEmpty()) {
             return null;
          }
-         List<String> headerRow = List.of("ID", "Officer", "NRIC", "Date Applied", "Status", "Project ID", "Project Name");
-         List<List<String>> tableData = new ArrayList<>();
+         List<java.lang.String> headerRow = List.of("ID", "Officer", "NRIC", "Date Applied", "Status", "Project ID", "Project Name");
+         List<List<java.lang.String>> tableData = new ArrayList<>();
          tableData.add(headerRow.subList(0, 4));
          for (RegistrationForm form : pendingRegistrations) {
-            List<String> fromRegistration = form.toStringAsList().subList(0, 4);
+            List<java.lang.String> fromRegistration = form.toStringAsList().subList(0, 4);
             tableData.add(fromRegistration);
          }
          return tableData;
@@ -132,10 +132,10 @@ public class ManagerController {
       }
    }
 
-   public Boolean processOfficerRegistration(String identifier, RegistrationStatus status) throws Exception {
+   public Boolean processOfficerRegistration(java.lang.String identifier, RegistrationStatus status) throws Exception {
       try {
 
-         String officerStr = managerService.setRegistrationStatus(identifier, status);
+         java.lang.String officerStr = managerService.setRegistrationStatus(identifier, status);
          if (officerStr != null) {
             managerService.addToOfficersList(officerStr);
 
@@ -148,7 +148,7 @@ public class ManagerController {
       return false;
    }
 
-   public String getCurrentProjectData() {
+   public java.lang.String getCurrentProjectData() {
       return managerService.getCurrentProject() != null ? managerService.getCurrentProject().toString() : null;
    }
 }

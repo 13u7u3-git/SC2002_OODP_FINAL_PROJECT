@@ -1,52 +1,51 @@
 package enquiry;
 
-import applicant.Applicant;
-import project.Project;
 import user.User;
 
-import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
-public class Enquiry implements Serializable {
-   private final int id;
-   private final Project project;
-   private final Applicant applicant;
+public class Enquiry {
+   private final Integer id;
+   private final String projectName;
+   private final Integer projectId;
+   private final String applicantName;
+   private final Integer applicantNric;
    private final LocalDate dateEnquired;
    private String enquiry;
    private String reply;
    private User respondent;
+   private LocalDate dateCreated;
    private LocalDate dateReplied;
 
-   protected Enquiry(int id, Project project, Applicant applicant, String enquiry) {
+   protected Enquiry(Integer id, String projectName, Integer projectId, String applicantName, Integer applicantNric, LocalDate dateEnquired) {
       this.id = id;
-      this.project = project;
-      this.applicant = applicant;
-      this.enquiry = enquiry;
-      this.dateEnquired = LocalDate.now();
-   }
-
-   // To load data for data persistence
-   Enquiry(int id, Project project, Applicant applicant, String enquiry, LocalDate dateEnquired, String Reply, User respondent, LocalDate dateReplied) {
-      this.id = id;
-      this.project = project;
-      this.applicant = applicant;
-      this.enquiry = enquiry;
+      this.projectName = projectName;
+      this.projectId = projectId;
+      this.applicantName = applicantName;
+      this.applicantNric = applicantNric;
       this.dateEnquired = dateEnquired;
-      this.reply = Reply;
-      this.respondent = respondent;
-      this.dateReplied = dateReplied;
+      this.dateCreated = LocalDate.now();
    }
 
    public Integer getId() {
       return id;
    }
 
-   public Project getProject() {
-      return project;
+   public String getProjectName() {
+      return projectName;
    }
 
-   public Applicant getApplicant() {
-      return applicant;
+   public String getApplicantName() {
+      return applicantName;
+   }
+
+   public Integer getApplicantNric() {
+      return applicantNric;
+   }
+
+   public Integer getProjectId() {
+      return projectId;
    }
 
    public LocalDate getDateEnquired() {
@@ -80,18 +79,34 @@ public class Enquiry implements Serializable {
       return dateReplied;
    }
 
+   public LocalDate getDateCreated() {
+      return dateCreated;
+   }
 
    @Override
    public String toString() {
-      return "Enquiry{" +
-              "id=" + id +
-              ", project=" + project +
-              ", applicant=" + applicant +
-              ", dateEnquired=" + dateEnquired +
-              ", enquiry='" + enquiry + '\'' +
-              ", reply='" + reply + '\'' +
-              ", respondent=" + respondent +
-              ", dateReplied=" + dateReplied +
-              '}';
+      return "============== Enquiry Details ==============\n" +
+              "Enquiry ID          : " + id + "\n" +
+              "Project             : " + projectName + "\n" +
+              "Applicant           : " + applicantName + "\n" +
+              "Date Enquired       : " + dateEnquired + "\n" +
+              "Enquiry             : " + enquiry + "\n" +
+              "Reply               : " + (reply != null ? reply : "N/A") + "\n" +
+              "Respondent          : " + (respondent != null ? respondent.getName() : "N/A") + "\n" +
+              "Date Replied        : " + (dateReplied != null ? dateReplied : "Pending") + "\n" +
+              "==============================================";
+   }
+
+   public List<String> toStringList() {
+      return List.of(
+              String.valueOf(id),
+              projectName,
+              applicantName,
+              dateEnquired.toString(),
+              enquiry,
+              reply != null ? reply : "N/A",
+              respondent != null ? respondent.getName() : "Unanswered",
+              dateReplied != null ? dateReplied.toString() : "Pending"
+      );
    }
 }

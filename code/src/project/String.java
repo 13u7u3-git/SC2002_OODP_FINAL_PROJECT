@@ -11,33 +11,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Project implements Serializable {
+public class String implements Serializable {
    @Serial
    private static final long serialVersionUID = 1L;
    // =================== Immutable Project Details =================== (never modified, at least not directly, only through the setter methods)
    private final Integer id;//automatically generated
-   private final String manager;
+   private final java.lang.String manager;
    private final Map<FlatType, Double> flatPrices;
    private final Map<FlatType, Integer> availableFlats;
    private final Map<FlatType, Integer> remainingFlats;//Officer can modify
-   private final List<String> officers;
+   private final List<java.lang.String> officers;
    private final List<RegistrationForm> registrationForms = new ArrayList<>();
    private final List<Application> applications = new ArrayList<>();
    private final List<Enquiry> enquiries = new ArrayList<>();
 
    // =================== Mutable Project Metadata ===================
-   private String projectName;
-   private String neighborhood;
+   private java.lang.String projectName;
+   private java.lang.String neighborhood;
    private LocalDate applicationOpeningDate;
    private LocalDate applicationClosingDate;
    private boolean visibility = false;
    private Integer availableOfficerSlots;
 
    // Use this when Manager wants to create a new project
-   public Project(int id, String projectName, String neighborhood, Integer twoRoomUnits, Double twoRoomPrice,
-                  Integer threeRoomUnits, Double threeRoomPrice, LocalDate applicationOpeningDate,
-                  LocalDate applicationClosingDate, String manager, Integer availableOfficerSlots,
-                  List<String> officers) {
+   public String(int id, java.lang.String projectName, java.lang.String neighborhood, Integer twoRoomUnits, Double twoRoomPrice,
+                 Integer threeRoomUnits, Double threeRoomPrice, LocalDate applicationOpeningDate,
+                 LocalDate applicationClosingDate, java.lang.String manager, Integer availableOfficerSlots,
+                 List<java.lang.String> officers) {
       this.id = id;
       this.projectName = projectName;
       this.neighborhood = neighborhood;
@@ -56,7 +56,7 @@ public class Project implements Serializable {
       return id;
    }
 
-   public String getManager() {
+   public java.lang.String getManager() {
       return manager;
    }
 
@@ -72,7 +72,7 @@ public class Project implements Serializable {
       return remainingFlats;
    }
 
-   public List<String> getOfficers() {
+   public List<java.lang.String> getOfficers() {
       return officers;
    }
 
@@ -96,19 +96,19 @@ public class Project implements Serializable {
       return enquiries;
    }
 
-   public String getProjectName() {
+   public java.lang.String getProjectName() {
       return projectName;
    }
 
-   public void setProjectName(String projectName) {
+   public void setProjectName(java.lang.String projectName) {
       this.projectName = projectName;
    }
 
-   public String getNeighborhood() {
+   public java.lang.String getNeighborhood() {
       return neighborhood;
    }
 
-   public void setNeighborhood(String neighborhood) {
+   public void setNeighborhood(java.lang.String neighborhood) {
       this.neighborhood = neighborhood;
    }
 
@@ -161,18 +161,33 @@ public class Project implements Serializable {
    }
 
 
-// =================== Mutable Project Metadata ===================
+   // =================== Mutable Project Metadata ===================
+   public void addApplication(Application application) {
+      applications.add(application);
+   }
+
+   public void removeApplication(Application application) {
+      applications.remove(application);
+   }
+
+   public void addEnquiry(Enquiry enquiry) {
+      enquiries.add(enquiry);
+   }
+
+   public void removeEnquiry(Enquiry enquiry) {
+      enquiries.remove(enquiry);
+   }
 
 
 // =================== Printable String Project Metadata ===================
 
    //"Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers"
-   public List<String> toStringAsList() {
+   public List<java.lang.String> toStringAsList() {
       return List.of(id.toString(), projectName, neighborhood, visibility ? "Visible" : "Hidden", getTwoRoomUnits().toString(), getTwoRoomPrice().toString(), getThreeRoomUnits().toString(), getThreeRoomPrice().toString(), applicationOpeningDate.toString(), applicationClosingDate.toString(), manager, availableOfficerSlots.toString(), officers.toString());
    }
 
    @Override // to print as a form like
-   public String toString() {
+   public java.lang.String toString() {
       return "============== Project Details ==============\n" +
               "Project ID          : " + id + "\n" +
               "Project Name        : " + projectName + "\n" +

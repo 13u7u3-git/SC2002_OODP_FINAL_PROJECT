@@ -1,27 +1,19 @@
 package applicant;
 
-import UniqueID.IUniqueIdService;
+import enquiry.Enquiry;
 import project.FlatType;
-import project.IProjectService;
-import project.Project;
-import system.ServiceRegistry;
+import project.String;
 import user.IPasswordValidationService;
 import user.User;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class ApplicantService implements IApplicantService {
-   private final IProjectService projectService;
-   private final IUniqueIdService uniqueIdService;
-   private final IPasswordValidationService passwordValidationService;
-
    private Applicant applicant;
 
    public ApplicantService() {
-      this.projectService = ServiceRegistry.get(IProjectService.class);
-      this.uniqueIdService = ServiceRegistry.get(IUniqueIdService.class);
-      this.passwordValidationService = ServiceRegistry.get(IPasswordValidationService.class);
    }
 
    @Override
@@ -30,22 +22,22 @@ public class ApplicantService implements IApplicantService {
    }
 
    @Override
-   public void setUser(Applicant applicant) {
-      this.applicant = applicant;
+   public void setUser(User applicant) {
+      this.applicant = (Applicant) applicant;
    }
 
    @Override
    public IPasswordValidationService getPasswordValidationService() {
-      return this.passwordValidationService;
+      return null;
    }
 
    @Override
-   public Predicate<Project> isEligibleForApplicant(Applicant applicant) {
+   public Predicate<String> isEligibleForApplicant(Applicant applicant) {
       // Only projects with visibility turned on are shown
       // Only projects with open application periods are shown
       // Singles (35+ years) can only see projects with 2-Room flats
-      // Married applicants (21+ years) can see all projects
-      // Projects the applicant has already applied for are always visible, regardless of visibility setting
+      // Married applicants (21+ years) can see all project
+      // the applicant has already applied for are always visible, regardless of visibility setting
 
       return project -> {
          // Check if applicant has already applied for this project
@@ -70,18 +62,27 @@ public class ApplicantService implements IApplicantService {
          }
 
          // Check eligibility based on age and marital status
+         // Married applicants (21+ years) can see all projects
          if (applicant.getAge() >= 35) {
             // Singles (35+ years) can only see projects with 2-Room flats
             return project.getAvailableFlats().containsKey(FlatType.TWO_ROOM) &&
                     project.getAvailableFlats().get(FlatType.TWO_ROOM) > 0;
          }
-         else if (applicant.getAge() >= 21) {
-            // Married applicants (21+ years) can see all projects
-            return true;
+         else {
+            return applicant.getAge() >= 21;
          }
 
          // Applicants under 21 are not eligible
-         return false;
       };
+   }
+
+   @Override
+   public List<Application> getApplicationsByApplicant(Applicant user) {
+      return user.getMyApplications();
+   }
+
+   @Override
+   public List<Enquiry> getEnquiriesByApplicant(Applicant user) {
+      return user.getEnquiries();
    }
 }

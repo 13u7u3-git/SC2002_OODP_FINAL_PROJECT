@@ -7,12 +7,12 @@ import java.util.Set;
 
 
 public class ProjectValidationService implements IProjectValidationService {
-   private static final Set<String> VALID_NEIGHBORHOODS = Set.of(
+   private static final Set<java.lang.String> VALID_NEIGHBORHOODS = Set.of(
            "Yishun", "Boon Lay", "Tampines", "Jurong West", "Bedok"
    );
 
    @Override
-   public void validateProjectNameUnique(Project project, List<Project> existingProjects) {
+   public void validateProjectNameUnique(String project, List<String> existingProjects) {
       existingProjects.stream()
               .filter(p -> p.getProjectName().equalsIgnoreCase(project.getProjectName()))
               .filter(p -> p.getNeighborhood().equalsIgnoreCase(project.getNeighborhood()))
@@ -53,7 +53,7 @@ public class ProjectValidationService implements IProjectValidationService {
    }
 
    @Override
-   public void validateNeighborhood(String neighborhood) {
+   public void validateNeighborhood(java.lang.String neighborhood) {
       if (!VALID_NEIGHBORHOODS.contains(neighborhood)) {
          throw new IllegalArgumentException("Invalid neighborhood specified");
       }

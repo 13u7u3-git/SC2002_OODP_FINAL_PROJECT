@@ -7,7 +7,7 @@ import officer.RegistrationForm;
 import officer.RegistrationStatus;
 import project.FlatType;
 import project.IProjectService;
-import project.Project;
+import project.String;
 import system.ServiceRegistry;
 import user.IPasswordValidationService;
 import user.User;
@@ -32,16 +32,16 @@ public class ManagerService implements IManagerService, StaffService {
       return null;
    }
 
-   public void createProject(String projectName, String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
+   public void createProject(java.lang.String projectName, java.lang.String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
                              Integer threeRoomUnits, Double threeRoomPrice, LocalDate applicationOpeningDate,
-                             LocalDate applicationClosingDate, String manager, Integer availableOfficerSlots,
-                             List<String> officers) {
+                             LocalDate applicationClosingDate, java.lang.String manager, Integer availableOfficerSlots,
+                             List<java.lang.String> officers) {
 
-      Project newProject = projectService.createProject(projectName, neighbourhood,
+      String newProject = projectService.createProject(projectName, neighbourhood,
               twoRoomUnits, twoRoomPrice, threeRoomUnits, threeRoomPrice, applicationOpeningDate, applicationClosingDate, manager, availableOfficerSlots, officers);
    }
 
-   public void updateProject(Project project, String name, String neighbourhood,
+   public void updateProject(String project, java.lang.String name, java.lang.String neighbourhood,
                              Map<FlatType, Integer> availableFlats, LocalDate openingDate,
                              LocalDate closingDate, boolean visibility) {
 
@@ -50,16 +50,16 @@ public class ManagerService implements IManagerService, StaffService {
 
    @Override
    public void deleteProject(Integer projectId) {
-      Project proj = projectService.getProjectById(projectId);
+      String proj = projectService.getProjectById(projectId);
       projectService.deleteProject(proj);
    }
 
    @Override
-   public Project getCurrentProject() {
+   public String getCurrentProject() {
       return manager.getCurrentProject();
    }
 
-   public void setCurrentProject(Project currentProject) {
+   public void setCurrentProject(String currentProject) {
       this.manager.setCurrentProject(currentProject);
    }
 
@@ -87,7 +87,7 @@ public class ManagerService implements IManagerService, StaffService {
 //   }
 
    @Override
-   public List<Project> getMyProjects() {
+   public List<String> getMyProjects() {
       //System.out.println("Manager: " + manager.getNric());
       return projectService.getFilteredProjects(project -> project.getManager().equals(this.manager.getName()));
    }
@@ -113,7 +113,7 @@ public class ManagerService implements IManagerService, StaffService {
    }
 
    @Override
-   public String setRegistrationStatus(String identifier, RegistrationStatus status) throws Exception {
+   public java.lang.String setRegistrationStatus(java.lang.String identifier, RegistrationStatus status) throws Exception {
       Integer id = null;
       try {
          id = Integer.parseInt(identifier);
@@ -122,7 +122,7 @@ public class ManagerService implements IManagerService, StaffService {
          // Identifier is not a number, assume it's a name
       }
 
-      Project project = manager.getCurrentProject();
+      String project = manager.getCurrentProject();
       try {
          if (id == null) {
             RegistrationForm f =
@@ -145,15 +145,15 @@ public class ManagerService implements IManagerService, StaffService {
    }
 
    @Override
-   public void addToOfficersList(String officerStr) {
-      Project project = manager.getCurrentProject();
-      String[] officerArr = officerStr.split(",");
-      for (String officer : officerArr) {
+   public void addToOfficersList(java.lang.String officerStr) {
+      String project = manager.getCurrentProject();
+      java.lang.String[] officerArr = officerStr.split(",");
+      for (java.lang.String officer : officerArr) {
          project.getOfficers().add(officer);
       }
    }
 
-   public void setOfficerCurrentProject(String officerName) {
+   public void setOfficerCurrentProject(java.lang.String officerName) {
       // TODO: Implement this method
       IOfficerService officerService = ServiceRegistry.get(IOfficerService.class);
       officerService.setOfficerCurrentProject(officerName, manager.getCurrentProject());

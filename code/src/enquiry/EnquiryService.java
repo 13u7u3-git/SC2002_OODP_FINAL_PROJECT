@@ -1,136 +1,171 @@
-//package enquiry;
-//
-//import applicant.Applicant;
-//import helper.Color;
-//import UniqueID.UniqueId;
-//import project.Project;
-//import project.ProjectRegistry;
-//import project.ProjectService;
-//import system.SessionManager;
-//
-//import java.util.List;
-//
-//public class EnquiryService {
-//    private final ProjectService projectService;
-//
-//    public EnquiryService(final ProjectService projectService) {
-//        this.projectService = projectService;
-//    }
-//
-//    public Enquiry createEnquiry(UniqueId uniqueId, Project project, Applicant applicant, String message) {
-//        return new Enquiry(uniqueId.getNextEnquiryId(), project, applicant, message);
-//    }
-//
-//    public void submitEnquiry(Enquiry enquiry) {
-//        // Enquiry service tells project enquiry: here's your enquiry, figure out which project it belongs to yourself
-//        projectService.addEnquiryToProject(enquiry);
-//        Color.println("Enquiry submitted successfully.", Color.GREEN);
-//    }
-//
-//    // manager wont even have the option to edit enquiry in menu
-//    // have to make sure that they edit their own enquiry.
-//    public void editEnquiry(Applicant currentUser, Enquiry enquiry, String newMessage) {
-//        if (!enquiry.getApplicant().equals(currentUser)) {
-//            Color.println("You are not allowed to edit this enquiry.", Color.RED);
-//            return;
-//        }
-//
-//        if (newMessage == null || newMessage.isBlank()) {
-//            Color.println("You must write something.", Color.RED);
-//            return;
-//        }
-//
-//        enquiry.setEnquiry(newMessage);
-//        Color.println("Enquiry edited successfully.", Color.GREEN);
-//    }
-//
-//
-//    // manager wont even have the option to delete. Need to confirm that current user deletes their own enquiry.
-//    // user cannot put random enquiry id and then it deletes that enquiry.
-//    public void deleteEnquiry(Applicant currentUser, Enquiry enquiry) {
-//        if (!enquiry.getApplicant().equals(currentUser)) {
-//            Color.println("You are not allowed to delete this enquiry.", Color.RED);
-//            return;
-//        }
-//
-//        projectService.removeEnquiryFromProject(enquiry);
-//        Color.println("Enquiry deleted successfully.", Color.GREEN);
-//    }
-//
-//
-//
-//    public void replyToEnquiry(Enquiry enquiry, String reply, SessionManager sessionManager) {
-//        if (enquiry.getReply().isEmpty()) {
-//            enquiry.setReply(reply, sessionManager.getCurrentUser());
-//            Color.println("Enquiry replied successfully.", Color.GREEN);
-//        }
-//        Color.println("Enquiry already has reply.", Color.RED);
-//
-//    }
-//
-//    public List<Enquiry> getEnquiriesForApplicant() {
-//        return null;
-//    }
-//
-//    public void getEnquiriesFrom(Project project) {
-//        List<Enquiry> enquiries = projectService.getAllEnquiriesFrom(project);
-//
-//        // Print project header once
-//        Color.println("\nProject: " + project.getProjectName() +
-//                " (ID: " + project.getId() + ")", Color.YELLOW);
-//
-//        if (enquiries.isEmpty()) {
-//            Color.println("  No enquiries for this project.", Color.RED);
-//            return;
-//        }
-//
-//        // Print all enquiries for this project
-//        for (Enquiry enquiry : enquiries) {
-//            Color.print("  Enquiry ID: " + enquiry.getId(), Color.CYAN);
-//            Color.println("  From: " + enquiry.getApplicant().getProjectName(), Color.CYAN);
-//            Color.println("  Message: " + enquiry.getEnquiry(), Color.CYAN);
-//
-//            // Print reply if exists
-//            if (enquiry.getReply() != null && !enquiry.getReply().isEmpty()) {
-//                Color.println("  Reply: " + enquiry.getReply(), Color.GREEN);
-//                Color.println("  Responded by: " + enquiry.getRespondent().getProjectName() +
-//                        " on " + enquiry.getDateReplied(), Color.GREEN);
-//            } else {
-//                Color.println("  Status: Pending reply", Color.RED);
-//            }
-//
-//            Color.println("  -----------------------------", Color.CYAN);
-//        }
-//    }
-//
-//    public void getEnquiresFromAllProjects(ProjectRegistry projectRegistry) {
-//        List<Enquiry> enquiries = projectService.getAllEnquiriesFromAllProjects(projectRegistry);
-//        Integer currentProjectId = null;
-//
-//        for(Enquiry enquiry : enquiries){
-//            // If we're starting a new project, print the project header
-//            if (!enquiry.getProject().getId().equals(currentProjectId)) {
-//                currentProjectId = enquiry.getProject().getId();
-//                Color.println("\nProject: " + enquiry.getProject().getProjectName() +
-//                        " (ID: " + currentProjectId + ")", Color.YELLOW);
-//                Color.println("  -----------------------------", Color.CYAN);
-//            }
-//
-//            // Print enquiry details
-//            Color.println("  Enquiry ID: " + enquiry.getId(), Color.CYAN);
-//            Color.println("  From: " + enquiry.getApplicant().getProjectName(), Color.CYAN);
-//            Color.println("  Message: " + enquiry.getEnquiry(), Color.CYAN);
-//
-//            // Print reply if exists
-//            if (enquiry.getReply() != null && !enquiry.getReply().isEmpty()) {
-//                Color.println("  Reply: " + enquiry.getReply(), Color.GREEN);
-//                Color.println("  Responded by: " + enquiry.getRespondent().getProjectName() +
-//                        " on " + enquiry.getDateReplied(), Color.GREEN);
-//            } else {
-//                Color.println("  Status: Pending reply", Color.RED);
-//            }
-//
-//            Color.println("  -----------------------------", Color.CYAN);
-//        }
-//    }
-//}
+package enquiry;
+
+import UniqueID.IUniqueIdService;
+import UniqueID.IdType;
+import UniqueID.UniqueIdService;
+import helper.Color;
+import project.ProjectRegistry;
+import project.ProjectService;
+import project.String;
+import system.ServiceRegistry;
+import system.SessionManager;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+public class EnquiryService {
+   private final ProjectService projectService;
+   private final IUniqueIdService uniqueIdService;
+   private final SessionManager sessionManager;
+
+   public EnquiryService(final ProjectService projectService, UniqueIdService uniqueIdService) {
+      this.projectService = projectService;
+      this.uniqueIdService = ServiceRegistry.get(IUniqueIdService.class);
+      this.sessionManager = ServiceRegistry.get(SessionManager.class);
+   }
+
+   public Enquiry createEnquiry(Integer projectId, java.lang.String applicantName, Integer applicantNric, java.lang.String message)
+           throws IllegalArgumentException {
+      try {
+         String project = projectService.getProjectById(projectId).isVisibility() ? projectService.getProjectById(projectId) : null;
+         if (project == null) {
+            throw new IllegalArgumentException("You cannot create an enquiry for that Project ID. Please try again.");
+         }
+         Enquiry enquiry = new Enquiry(uniqueIdService.generateUniqueId(IdType.ENQUIRY_ID), project.getProjectName(), projectId, applicantName, applicantNric, LocalDate.now());
+         if (enquiry == null) {
+            throw new IllegalArgumentException("Something went wrong while creating enquiry. Try again.");
+         }
+         enquiry.setEnquiry(message);
+         return enquiry;//success
+      }
+      catch (Exception e) {
+         throw new IllegalArgumentException("Something went wrong while creating enquiry. Try again.");
+      }
+
+
+   }
+
+   public void submitEnquiry(Enquiry enquiry) throws IllegalArgumentException {
+      try {
+         projectService.addEnquiryToProject(enquiry);
+      }
+      catch (Exception e) {
+         throw new IllegalArgumentException("Something went wrong while submitting enquiry. Try again.");
+      }
+   }
+
+   // manager wont even have the option to edit enquiry in menu
+   // have to make sure that they edit their own enquiry.
+   public void editEnquiry(Enquiry enquiry, java.lang.String newMessage) throws IllegalArgumentException {
+      if (!enquiry.getApplicantNric().equals(sessionManager.getCurrentUser().getNric())) {
+         throw new IllegalArgumentException("You are not allowed to edit this enquiry.");
+      }
+
+      if (newMessage == null || newMessage.isBlank()) {
+         throw new IllegalArgumentException("Your message is Empty.");
+      }
+      try {
+         enquiry.setEnquiry(newMessage);
+      }
+      catch (Exception e) {
+         throw new IllegalArgumentException("Something went wrong while editing enquiry. Try again.");
+      }
+
+   }
+
+   // manager wont even have the option to delete. Need to confirm that current user deletes their own enquiry.
+   // user cannot put random enquiry id and then it deletes that enquiry.
+   public void deleteEnquiry(Enquiry enquiry) throws IllegalArgumentException {
+
+      // Safety check: make sure the applicant owns the enquiry
+      if (!enquiry.getApplicantNric().equals(sessionManager.getCurrentUser().getNric())) {
+         throw new IllegalArgumentException("You are not allowed to delete this enquiry.");
+      }
+
+      // Check if the enquiry has a reply (can't delete)
+      if (enquiry.getReply() != null && !enquiry.getReply().isBlank()) {
+         throw new IllegalArgumentException("Cannot delete enquiry with a reply.");
+      }
+      projectService.removeEnquiryFromProject(enquiry);
+   }
+
+   public void replyToEnquiry(Enquiry enquiry, java.lang.String reply) {
+      if (enquiry.getReply() == null || enquiry.getReply().isEmpty()) {
+         enquiry.setReply(reply, sessionManager.getCurrentUser());
+         Color.println("Enquiry replied successfully.", Color.GREEN);
+      }
+      else {
+         Color.println("Enquiry already has reply.", Color.RED);
+      }
+   }
+
+   public List<List<java.lang.String>> getEnquiriesFor(java.lang.String projectId) {
+      List<List<java.lang.String>> enquiries = projectService.getEnquiriesFrom(projectId);
+
+      // Define headers without "Project Name" since we're viewing a single project
+      List<java.lang.String> headers = List.of(
+              "Enquiry ID",
+              "Applicant Name",
+              "Date Enquired",
+              "Enquiry",
+              "Reply",
+              "Respondent",
+              "Date Replied"
+      );
+
+      // Initialize empty list if null
+      if (enquiries == null) {
+         enquiries = new ArrayList<>();
+      }
+
+      // Remove "Project Name" column (index 1) from each row if there are enquiries
+      if (!enquiries.isEmpty()) {
+         for (List<java.lang.String> row : enquiries) {
+            if (row.size() > 1) {
+               row.remove(1); // Remove the "Project Name" column
+            }
+         }
+      }
+
+      // Add headers as the first row
+      if (enquiries.isEmpty()) {
+         enquiries.add(headers);
+      }
+      else {
+         enquiries.add(0, headers);
+      }
+
+      return enquiries;
+   }
+
+   public List<List<java.lang.String>> getEnquiresFromAllProjects(ProjectRegistry projectRegistry) {
+      List<List<java.lang.String>> enquiries = projectService.getAllEnquiriesFromAllProjects();
+
+      // Add headers based on Enquiry.toStringList() fields
+      List<java.lang.String> headers = List.of(
+              "Enquiry ID",
+              "Project Name",
+              "Applicant Name",
+              "Date Enquired",
+              "Enquiry",
+              "Reply",
+              "Respondent",
+              "Date Replied"
+      );
+
+      // Insert headers as the first row
+      if (enquiries == null) {
+         enquiries = new ArrayList<>();
+      }
+
+      if (enquiries.isEmpty()) {
+         enquiries.add(headers);
+      }
+      else {
+         enquiries.add(0, headers);
+      }
+
+      return enquiries;
+   }
+}

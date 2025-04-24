@@ -1,11 +1,11 @@
 package officer;
 
-import project.Project;
+import project.String;
 import user.IUserService;
 
 public interface IOfficerService extends IUserService {
    // Officer Registration
-   RegistrationForm createRegistrationForm(String projectId);
+   RegistrationForm createRegistrationForm(java.lang.String projectId);
 
    void sendRegistrationRequest(RegistrationForm registrationForm);
 
@@ -22,11 +22,11 @@ public interface IOfficerService extends IUserService {
    void removeRegistrationForm(RegistrationForm form);
 
    // Project Handling
-   Project getCurrentProject();
+   String getCurrentProject();
 
    void setUser(Officer officer);
 
-   void setOfficerCurrentProject(String officerName, Project currentProject);
+   void setOfficerCurrentProject(java.lang.String officerName, String currentProject);
 
 
    // Application Management

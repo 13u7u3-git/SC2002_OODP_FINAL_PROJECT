@@ -1,7 +1,7 @@
 package officer;
 
 import applicant.Applicant;
-import project.Project;
+import project.String;
 import user.MaritalStatus;
 
 import java.util.ArrayList;
@@ -9,11 +9,11 @@ import java.util.List;
 
 public class Officer extends Applicant {
    private final List<RegistrationForm> myRegistrationForms;
-   private Project currentProject;
+   private String currentProject;
    private RegistrationForm currentRegistrationForm;
    private OfficerStatus officerStatus;
 
-   public Officer(String name, String nric, String password, int age, MaritalStatus maritalStatus) {
+   public Officer(java.lang.String name, java.lang.String nric, java.lang.String password, int age, MaritalStatus maritalStatus) {
       super(name, nric, password, age, maritalStatus);
       this.currentProject = null;
       this.currentRegistrationForm = null;
@@ -49,16 +49,16 @@ public class Officer extends Applicant {
       myRegistrationForms.remove(registrationForm);
    }
 
-   public Project getCurrentProject() {
+   public String getCurrentProject() {
       return currentProject;
    }
 
-   public void setCurrentProject(Project currentProject) {
+   public void setCurrentProject(String currentProject) {
       this.currentProject = currentProject;
    }
 
    @Override
-   public String toString() {
+   public java.lang.String toString() {
       return "========== Officer Information ==========\n" +
               "Name           : " + super.getName() + "\n" +
               "NRIC           : " + super.getNric() + "\n" +

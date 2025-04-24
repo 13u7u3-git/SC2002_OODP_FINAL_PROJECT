@@ -3,8 +3,8 @@ package helper.ProjectRegistryLoader;
 
 import UniqueID.IUniqueIdService;
 import helper.loader.DelimitedTextDataLoader;
-import project.Project;
 import project.ProjectRegistry;
+import project.String;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class ProjectRegistryLoaderService {
 
-   private static final String TAB_DELIMITER = "\t";
+   private static final java.lang.String TAB_DELIMITER = "\t";
    // Count the columns in the example row: 13
    // Project Name, Neighborhood, Type 1, Units 1, Price 1, Type 2, Units 2, Price 2,
    // Open Date, Close Date, Manager, Officer Slot, Officer List
@@ -34,16 +34,16 @@ public class ProjectRegistryLoaderService {
     * @throws IOException If an I/O error occurs during file reading.
     * @throws Exception   If any unexpected error occurs during the loading process or mapping.
     */
-   public void loadRegistry(String projectFilePath) throws IOException, Exception {
+   public void loadRegistry(java.lang.String projectFilePath) throws IOException, Exception {
 
       // Load Projects
       System.out.println("Loading Projects from: " + projectFilePath);
-      DelimitedTextDataLoader<Project> projectLoader = new DelimitedTextDataLoader<>();
+      DelimitedTextDataLoader<String> projectLoader = new DelimitedTextDataLoader<>();
 
       // Instantiate the ProjectRowMapper class to handle row-to-object mapping and ID generation
       ProjectRowMapper projectRowMapper = new ProjectRowMapper(uniqueIdService);
 
-      List<Project> projects = projectLoader.loadData(
+      List<String> projects = projectLoader.loadData(
               projectFilePath,
               TAB_DELIMITER,
               projectRowMapper, // Pass the mapper instance

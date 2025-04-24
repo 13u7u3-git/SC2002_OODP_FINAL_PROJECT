@@ -5,7 +5,7 @@ public class UniqueIdService implements IUniqueIdService {
 
    public UniqueIdService() {
       this.uniqueId = new UniqueId();
-      uniqueId.loadFromPropertiesFile();
+      //uniqueId.loadFromPropertiesFile();
    }
 
    @Override

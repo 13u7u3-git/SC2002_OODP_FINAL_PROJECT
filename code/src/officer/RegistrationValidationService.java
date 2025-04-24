@@ -1,7 +1,7 @@
 package officer;
 
-import project.Project;
 import project.ProjectRegistry;
+import project.String;
 
 import java.time.LocalDate;
 
@@ -14,7 +14,7 @@ public class RegistrationValidationService implements IRegistrationValidationSer
 
    @Override
    public void validateRegistration(RegistrationForm form) {
-      Project targetProject = projectRegistry.getProjects().stream()
+      String targetProject = projectRegistry.getProjects().stream()
               .filter(p -> p.getId().equals(form.getProjectId()))
               .findFirst()
               .orElseThrow(() -> new IllegalArgumentException("Project does not exist"));
@@ -24,7 +24,7 @@ public class RegistrationValidationService implements IRegistrationValidationSer
       validateApplicationPeriod(targetProject);
    }
 
-   private void validateApplicationPeriod(Project project) {
+   private void validateApplicationPeriod(String project) {
       LocalDate today = LocalDate.now();
       if (today.isBefore(project.getApplicationOpeningDate()) ||
               today.isAfter(project.getApplicationClosingDate())) {
@@ -32,13 +32,13 @@ public class RegistrationValidationService implements IRegistrationValidationSer
       }
    }
 
-   private void validateOfficerSlots(Project project) {
+   private void validateOfficerSlots(String project) {
       if (project.getAvailableOfficerSlots() <= 0) {
          throw new IllegalArgumentException("No available officer slots for this project");
       }
    }
 
-   private void validateNoExistingRegistration(String nric, Project newProject) {
+   private void validateNoExistingRegistration(java.lang.String nric, String newProject) {
       projectRegistry.getProjects().stream()
               .filter(p -> p.getOfficers().contains(nric))
               .filter(p -> datesOverlap(p, newProject))
@@ -48,12 +48,12 @@ public class RegistrationValidationService implements IRegistrationValidationSer
               });
    }
 
-   private boolean datesOverlap(Project existing, Project newProject) {
+   private boolean datesOverlap(String existing, String newProject) {
       return !existing.getApplicationClosingDate().isBefore(newProject.getApplicationOpeningDate()) &&
               !existing.getApplicationOpeningDate().isAfter(newProject.getApplicationClosingDate());
    }
 
-   private void validateNotAlreadyHandling(String officer, Project project) {
+   private void validateNotAlreadyHandling(java.lang.String officer, String project) {
       if (project.getOfficers().contains(officer)) {
          throw new IllegalArgumentException("Officer already assigned to this project");
       }

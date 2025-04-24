@@ -8,7 +8,7 @@ public class User implements Serializable {
    private final int age;
    private final MaritalStatus maritalStatus;
    private String password;
-   private UserFilterSettings filterSettings;
+   private transient UserFilterSettings filterSettings;
 
    public User() {
       this.name = null;
@@ -63,6 +63,8 @@ public class User implements Serializable {
 
 
 }
+
+
 
 
 

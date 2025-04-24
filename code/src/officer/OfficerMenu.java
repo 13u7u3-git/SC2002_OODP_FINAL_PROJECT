@@ -3,7 +3,7 @@ package officer;
 import helper.Color;
 import helper.TablePrinter;
 import interfaces.Menu;
-import project.Project;
+import project.String;
 import system.SessionManager;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public class OfficerMenu extends Menu {
    }
 
    protected void handleInput() {
-      String input = scanner.nextLine();
+      java.lang.String input = scanner.nextLine();
       switch (input) {
          case "1" -> handleViewAllProjects();
          case "2" -> handleApplyForBTOProject(); // TODO: not yet
@@ -68,7 +68,7 @@ public class OfficerMenu extends Menu {
 
    private void handleViewAllProjects() {
       try {
-         List<List<String>> tableData = officerController.getAllProjectsTableData();
+         List<List<java.lang.String>> tableData = officerController.getAllProjectsTableData();
          if (tableData.isEmpty()) {
             Color.println("No projects found.", Color.RED);
             return;
@@ -94,7 +94,7 @@ public class OfficerMenu extends Menu {
       }
 
       try {
-         List<List<String>> table = officerController.getOfficerEligibleProjectsTableData();
+         List<List<java.lang.String>> table = officerController.getOfficerEligibleProjectsTableData();
          if (table == null) {
             Color.println("No projects found.", Color.RED);
             return;
@@ -102,12 +102,12 @@ public class OfficerMenu extends Menu {
 
          Integer COLUMN_WIDTH = 15;
          TablePrinter tablePrinter = new TablePrinter();
-         for (List<String> row : table) {
+         for (List<java.lang.String> row : table) {
             tablePrinter.printRow(COLUMN_WIDTH, row);
          }
 
          Color.print("Enter the project name or ID you want to register for (0 to exit): ", Color.GREEN);
-         String projectName = scanner.nextLine();
+         java.lang.String projectName = scanner.nextLine();
          if (projectName.equals("0")) {
             Color.println("Returning to Officer Menu.", Color.RED);
             return;
@@ -119,7 +119,7 @@ public class OfficerMenu extends Menu {
          }
 
          Color.print("Do you want to send the registration request? (y/n): ", Color.GREEN);
-         String confirm = scanner.nextLine();
+         java.lang.String confirm = scanner.nextLine();
          if (confirm.equals("y")) {
             officerController.sendRegistrationRequest(form);
             Color.println("Registration Form sent successfully.", Color.CYAN);
@@ -147,7 +147,7 @@ public class OfficerMenu extends Menu {
          case ACTIVE -> {
             Color.println("You are currently an active officer", Color.GREEN);
             try {
-               Project project = officerController.getCurrentProject();
+               String project = officerController.getCurrentProject();
                Color.println(project.toString(), Color.YELLOW);
             }
             catch (Exception e) {
@@ -184,7 +184,7 @@ public class OfficerMenu extends Menu {
       Color.println("Viewing Details of Handled Project", Color.GREEN);
 
       try {
-         Project project = officerController.getCurrentProject();
+         String project = officerController.getCurrentProject();
          Color.println(project.toString(), Color.YELLOW);
       }
       catch (Exception e) {
@@ -204,7 +204,7 @@ public class OfficerMenu extends Menu {
    }
 
    private void handleChangePassword() {
-      List<String> inputs = super.getInputsChangePassword();
+      List<java.lang.String> inputs = super.getInputsChangePassword();
       try {
          officerController.changePassword(inputs.get(0), inputs.get(1), inputs.get(2));
          Color.println("Password changed successfully.", Color.GREEN);

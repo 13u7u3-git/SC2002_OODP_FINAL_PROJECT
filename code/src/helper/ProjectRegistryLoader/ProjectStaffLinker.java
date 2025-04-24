@@ -65,7 +65,7 @@ public class ProjectStaffLinker {
       });
    }
 
-   private boolean isProjectActive(project.Project project) {
+   private boolean isProjectActive(project.String project) {
       LocalDate now = LocalDate.now();
       LocalDate openingDate = project.getApplicationOpeningDate();
       LocalDate closingDate = project.getApplicationClosingDate();

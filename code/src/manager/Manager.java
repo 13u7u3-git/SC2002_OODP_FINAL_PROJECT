@@ -1,27 +1,27 @@
 package manager;
 
-import project.Project;
+import project.String;
 import user.MaritalStatus;
 import user.User;
 import user.UserFilterSettings;
 
 public class Manager extends User {
-   Project currentProject;
+   String currentProject;
 
-   public Manager(String name,
-                  String nric,
-                  String password,
+   public Manager(java.lang.String name,
+                  java.lang.String nric,
+                  java.lang.String password,
                   int age,
                   MaritalStatus maritalStatus) {
       super(name, nric, password, age, maritalStatus, new UserFilterSettings());
       this.currentProject = null;
    }
 
-   public Project getCurrentProject() {
+   public String getCurrentProject() {
       return currentProject;
    }
 
-   public void setCurrentProject(Project currentProject) {
+   public void setCurrentProject(String currentProject) {
       this.currentProject = currentProject;
    }
 

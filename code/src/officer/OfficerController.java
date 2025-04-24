@@ -2,7 +2,7 @@ package officer;
 
 import helper.Color;
 import project.IProjectService;
-import project.Project;
+import project.String;
 import system.ServiceRegistry;
 
 import java.util.ArrayList;
@@ -18,29 +18,29 @@ public class OfficerController {
       this.projectService = ServiceRegistry.get(IProjectService.class);
    }
 
-   public List<List<String>> getAllProjectsTableData() throws Exception {
-      List<Project> projects = projectService.getAllProjects();
+   public List<List<java.lang.String>> getAllProjectsTableData() throws Exception {
+      List<String> projects = projectService.getAllProjects();
       if (projects == null || projects.isEmpty()) {
          return null;
       }
       else {
-         List<String> headerRow = List.of("Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers");
-         List<List<String>> tableData = new ArrayList<>();
+         List<java.lang.String> headerRow = List.of("Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers");
+         List<List<java.lang.String>> tableData = new ArrayList<>();
          tableData.add(headerRow);
-         for (Project p : projects) {
-            List<String> fromEachProject = p.toStringAsList();
+         for (String p : projects) {
+            List<java.lang.String> fromEachProject = p.toStringAsList();
             tableData.add(fromEachProject);
          }
          return tableData;
       }
    }
 
-   public List<List<String>> getOfficerEligibleProjectsTableData() throws Exception {
+   public List<List<java.lang.String>> getOfficerEligibleProjectsTableData() throws Exception {
       if (officerService.getOfficerStatus() != OfficerStatus.INACTIVE) {
          throw new IllegalStateException("You are already registered as an officer for the project.");
       }
 
-      List<Project> projects = projectService.getFilteredProjects(project ->
+      List<String> projects = projectService.getFilteredProjects(project ->
               project.getOfficers().size() < project.getAvailableOfficerSlots()
       );
 
@@ -48,16 +48,16 @@ public class OfficerController {
          return null;
       }
 
-      List<String> headerRow = List.of("Project ID", "Project Name", "Neighbourhood", "Visibility",
+      List<java.lang.String> headerRow = List.of("Project ID", "Project Name", "Neighbourhood", "Visibility",
               "Two Room Units", "Two Room Price", "Three Room Units",
               "Three Room Price", "Appln..Opening Date", "Appln..Closing Date",
               "Manager", "Officer Slots", "Officers");
 
-      List<List<String>> tableData = new ArrayList<>();
+      List<List<java.lang.String>> tableData = new ArrayList<>();
       tableData.add(headerRow);
 
-      for (Project project : projects) {
-         List<String> row = List.of(
+      for (String project : projects) {
+         List<java.lang.String> row = List.of(
                  project.getId().toString(),
                  project.getProjectName(),
                  project.getNeighborhood(),
@@ -79,10 +79,10 @@ public class OfficerController {
    }
 
 
-   public RegistrationForm CreateRegistrationForm(String project) {
+   public RegistrationForm CreateRegistrationForm(java.lang.String project) {
       // TODO : check if officer is already an applicant for the project
 
-      String projectStr = null;
+      java.lang.String projectStr = null;
       projectStr = projectService.returnNameIfProjectExists(project.trim());
       if (projectStr == null) {
          Color.println("Form not Created. Project not found or Error Creating Form. Try Again", Color.RED);
@@ -105,7 +105,7 @@ public class OfficerController {
       return officerService.getOfficerStatus();
    }
 
-   public Project getCurrentProject() throws Exception {
+   public String getCurrentProject() throws Exception {
       return officerService.getCurrentProject();
    }
 
@@ -113,7 +113,7 @@ public class OfficerController {
       return officerService.getCurrentRegistrationForm();
    }
 
-   public void changePassword(String oldPassword, String newPassword, String confirmPassword) {
+   public void changePassword(java.lang.String oldPassword, java.lang.String newPassword, java.lang.String confirmPassword) {
       officerService.changePassword(oldPassword, newPassword, confirmPassword);
    }
 

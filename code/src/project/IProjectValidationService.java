@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface IProjectValidationService {
 
-   void validateProjectNameUnique(Project project, List<Project> existingProjects);
+   void validateProjectNameUnique(String project, List<String> existingProjects);
 
    void validateApplicationDates(LocalDate openingDate, LocalDate closingDate);
 
@@ -14,6 +14,6 @@ public interface IProjectValidationService {
 
    void validateOfficerSlots(int slots);
 
-   void validateNeighborhood(String neighborhood);
+   void validateNeighborhood(java.lang.String neighborhood);
 }
 

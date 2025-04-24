@@ -9,18 +9,18 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 // This class is used to store all projects in a list
-public class ProjectRegistry implements Serializable, Filterable<Project> {
+public class ProjectRegistry implements Serializable, Filterable<String> {
    @Serial
    private static final long serialVersionUID = 1L;
-   private static final String filePath = "./data/projectRegistry.dat";
-   private final List<Project> projects;
+   private static final java.lang.String filePath = "./data/projectRegistry.dat";
+   private final List<String> projects;
 
    public ProjectRegistry() {
       this.projects = new ArrayList<>();
    }
 
    // We will always use this because we will always be loading projects from csv.
-   public ProjectRegistry(List<Project> projects) {
+   public ProjectRegistry(List<String> projects) {
       this.projects = projects;
    }
 
@@ -39,16 +39,16 @@ public class ProjectRegistry implements Serializable, Filterable<Project> {
    // Only for other service classes to view and filter, cannot make any changes to the original list.
    // Cannot modify the original list structure (add/remove projects).
    // Please use add or remove methods explicitly if manager wants to add or remove projects.
-   public List<Project> getProjects() {
+   public List<String> getProjects() {
       return List.copyOf(projects);
    }
 
-   public void addProject(Project project) {
+   public void addProject(String project) {
       projects.add(project);
       save();
    }
 
-   public void removeProject(Project project) {
+   public void removeProject(String project) {
       projects.remove(project);
    }
 
@@ -64,7 +64,7 @@ public class ProjectRegistry implements Serializable, Filterable<Project> {
    }
 
    @Override
-   public List<Project> filter(Predicate<Project> predicate) {
+   public List<String> filter(Predicate<String> predicate) {
       return projects.stream()
               .filter(predicate)
               .collect(Collectors

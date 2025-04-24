@@ -2,6 +2,8 @@ package project;
 
 import UniqueID.IUniqueIdService;
 import UniqueID.IdType;
+import applicant.Application;
+import enquiry.Enquiry;
 import officer.IRegistrationValidationService;
 import officer.RegistrationForm;
 import officer.RegistrationValidationService;
@@ -25,7 +27,7 @@ public class ProjectService implements IProjectService {
    }
 
    @Override
-   public Project getProjectById(Integer projectId) {
+   public String getProjectById(Integer projectId) {
       return projectRegistry.getProjects().stream()
               .filter(p -> p.getId().equals(projectId))
               .findFirst()
@@ -33,7 +35,7 @@ public class ProjectService implements IProjectService {
    }
 
    @Override
-   public Project getProjectByName(String projectName) {
+   public String getProjectByName(java.lang.String projectName) {
       return projectRegistry.getProjects().stream()
               .filter(p -> p.getProjectName().equals(projectName))
               .findFirst()
@@ -41,18 +43,18 @@ public class ProjectService implements IProjectService {
    }
 
    @Override
-   public List<Project> getAllProjects() {
+   public List<String> getAllProjects() {
       return projectRegistry.getProjects();
    }
 
 
    // --- Project Management ---
    @Override
-   public Project createProject(String projectName, String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
-                                Integer threeRoomUnits, Double threeRoomPrice, LocalDate applicationOpeningDate,
-                                LocalDate applicationClosingDate, String manager, Integer availableOfficerSlots,
-                                List<String> officers) {
-      Project project = new Project(uniqueIdService.generateUniqueId(IdType.PROJECT_ID), projectName, neighbourhood,
+   public String createProject(java.lang.String projectName, java.lang.String neighbourhood, Integer twoRoomUnits, Double twoRoomPrice,
+                               Integer threeRoomUnits, Double threeRoomPrice, LocalDate applicationOpeningDate,
+                               LocalDate applicationClosingDate, java.lang.String manager, Integer availableOfficerSlots,
+                               List<java.lang.String> officers) {
+      String project = new String(uniqueIdService.generateUniqueId(IdType.PROJECT_ID), projectName, neighbourhood,
               twoRoomUnits, twoRoomPrice, threeRoomUnits, threeRoomPrice, applicationOpeningDate, applicationClosingDate, manager, availableOfficerSlots, officers);
       validateNewProject(project);//throws exception if project is invalid and propagates to caller
       addProjectToRegistry(project);
@@ -60,47 +62,47 @@ public class ProjectService implements IProjectService {
    }
 
    @Override
-   public void deleteProject(Project project) {
+   public void deleteProject(String project) {
       projectRegistry.removeProject(project);
    }
 
    @Override
-   public String returnNameIfProjectExists(String projectName) {
+   public java.lang.String returnNameIfProjectExists(java.lang.String projectName) {
       //check existence of project by name and id
-      String returnName = projectRegistry.getProjects().stream()
+      java.lang.String returnName = projectRegistry.getProjects().stream()
               .filter(p -> p.getProjectName().equals(projectName))
               .findFirst()
-              .map(Project::getProjectName)
+              .map(String::getProjectName)
               .orElse(null);
       //check by id
       if (returnName == null) {
          returnName = projectRegistry.getProjects().stream()
                  .filter(p -> p.getId().equals(Integer.parseInt(projectName)))
                  .findFirst()
-                 .map(Project::getProjectName)
+                 .map(String::getProjectName)
                  .orElse(null);
       }
       return returnName;
    }
 
    @Override
-   public void addProjectToRegistry(Project project) {
+   public void addProjectToRegistry(String project) {
       projectRegistry.addProject(project);
    }
 
    @Override
-   public void removeProjectFromRegistry(Project project) {
+   public void removeProjectFromRegistry(String project) {
       projectRegistry.removeProject(project);
    }
 
    @Override
-   public List<Project> getFilteredProjects(Predicate<Project> predicate) {
+   public List<String> getFilteredProjects(Predicate<String> predicate) {
       return projectRegistry.filter(predicate);
    }
 
    // --- Validation ---
    @Override
-   public void validateNewProject(Project project) throws IllegalArgumentException {
+   public void validateNewProject(String project) throws IllegalArgumentException {
       projectValidationService.validateProjectNameUnique(project, getAllProjects());
       projectValidationService.validateApplicationDates(project.getApplicationOpeningDate(),
               project.getApplicationClosingDate());
@@ -113,7 +115,41 @@ public class ProjectService implements IProjectService {
    @Override
    public void addRegistrationToProject(RegistrationForm form) throws IllegalArgumentException {
       registrationValidationService.validateRegistration(form);
-      Project project = getProjectById(form.getProjectId());
+      String project = getProjectById(form.getProjectId());
       project.addRegistrationForm(form);
+   }
+
+   @Override
+   public List<List<java.lang.String>> getAllEnquiriesFromAllProjects() {
+      return projectRegistry.getProjects().stream()
+              .flatMap(p -> p.getEnquiries().stream())
+              .map(Enquiry::toStringList)
+              .toList();
+   }
+
+   @Override
+   public List<List<java.lang.String>> getEnquiriesFrom(java.lang.String projectId) {
+      return projectRegistry.getProjects().stream()
+              .filter(p -> p.getId().equals(projectId))
+              .flatMap(p -> p.getEnquiries().stream().map(Enquiry::toStringList))
+              .toList();
+   }
+
+   @Override
+   public void addEnquiryToProject(Enquiry enquiry) {
+      String project = getProjectById(enquiry.getProjectId());
+      project.addEnquiry(enquiry);
+   }
+
+   @Override
+   public void removeEnquiryFromProject(Enquiry enquiry) {
+      String project = getProjectById(enquiry.getProjectId());
+      project.removeEnquiry(enquiry);
+   }
+
+   @Override
+   public void addApplicationToProject(Application application) {
+      String project = getProjectById(application.getProjectId());
+      project.addApplication(application);
    }
 }

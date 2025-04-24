@@ -13,6 +13,7 @@ import project.ProjectRegistry;
 import project.ProjectService;
 import user.IPasswordValidationService;
 import user.PasswordValidationService;
+import user.UserFilterManager;
 
 import java.util.Scanner;
 
@@ -21,7 +22,7 @@ public class EntryPoint {
       boolean running = true; // Flag to control the main loop
       Scanner scanner = new Scanner(System.in);
       TablePrinter tablePrinter = new TablePrinter();
-      Boolean loadFromTxt = true;
+      Boolean loadFromTxt = false;
 
       // Initialize and register all services to ServiceRegistry
       initializeServices(loadFromTxt); // written in the initializeServices method below, to prevent DI boilerplate
@@ -128,5 +129,8 @@ public class EntryPoint {
 
       ManagerController managerController = new ManagerController();
       ServiceRegistry.register(ManagerController.class, managerController);
+
+      UserFilterManager userFilterManager = new UserFilterManager(new Scanner(System.in));
+      ServiceRegistry.register(UserFilterManager.class, userFilterManager);
    }
 }

@@ -5,7 +5,7 @@ import UniqueID.IdType;
 import enquiry.Enquiry;
 import interfaces.StaffService;
 import project.IProjectService;
-import project.Project;
+import project.String;
 import system.ServiceRegistry;
 import user.IPasswordValidationService;
 import user.User;
@@ -33,7 +33,7 @@ public class OfficerService implements IOfficerService, StaffService {
          return;
       }
 
-      Project currentProject = officer.getCurrentProject();
+      String currentProject = officer.getCurrentProject();
       RegistrationForm currentRegistrationForm = getCurrentRegistrationForm();
 
       if (currentProject != null) {
@@ -52,7 +52,7 @@ public class OfficerService implements IOfficerService, StaffService {
          if (currentRegistrationForm.isApproved()) {
             //System.outprintln("Registration form approved. Setting status to ACTIVE");
             setOfficerStatus(OfficerStatus.ACTIVE);
-            Project project = projectService.getProjectById(currentRegistrationForm.getProjectId());
+            String project = projectService.getProjectById(currentRegistrationForm.getProjectId());
             if (project != null) {
                officer.setCurrentProject(project);
                //System.outprintln("Assigned to project: " + project.getProjectName());
@@ -74,7 +74,7 @@ public class OfficerService implements IOfficerService, StaffService {
    }
 
    @Override
-   public RegistrationForm createRegistrationForm(String projectName) {
+   public RegistrationForm createRegistrationForm(java.lang.String projectName) {
       return new RegistrationForm(uniqueIdService.generateUniqueId(IdType.REGISTRATION_FORM_ID), officer.getName(), officer.getNric(), projectService.getProjectByName(projectName).getId(), projectName);
    }
 
@@ -115,7 +115,7 @@ public class OfficerService implements IOfficerService, StaffService {
    }
 
    @Override
-   public Project getCurrentProject() {
+   public String getCurrentProject() {
       return officer.getCurrentProject();
    }
 
@@ -131,7 +131,7 @@ public class OfficerService implements IOfficerService, StaffService {
    }
 
    @Override
-   public void setOfficerCurrentProject(String officerName, Project currentProject) {
+   public void setOfficerCurrentProject(java.lang.String officerName, String currentProject) {
       UserRegistry userRegistry = ServiceRegistry.get(UserRegistry.class);
       Officer officer = (Officer) userRegistry.getUser(officerName);
       officer.setCurrentProject(currentProject);

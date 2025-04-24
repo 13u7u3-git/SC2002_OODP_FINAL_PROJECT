@@ -1,26 +1,29 @@
 package applicant;
 
 import project.FlatType;
-import project.Project;
-import user.User;
+import project.String;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 
 public class Application implements Serializable {
-   private final int id;
-   private final User applicant;
-   private final Project project;
+   private final Integer id;
+   private final String applicantName;
+   private final String applicantNric;
+   private final Integer projectId;
+   private final String projectName;
    private final FlatType flatType;
    private final LocalDate dateApplied;
    private ApplicationStatus applicationStatus;
    private BookingStatus bookingStatus;
    private WithdrawalRequestStatus withdrawalRequestStatus;
 
-   protected Application(int id, User applicant, Project project, FlatType flatType) {
+   public Application(Integer id, String applicantName, String applicantNric, Integer projectId, String projectName, FlatType flatType) {
       this.id = id;
-      this.applicant = applicant;
-      this.project = project;
+      this.applicantName = applicantName;
+      this.applicantNric = applicantNric;
+      this.projectId = projectId;
+      this.projectName = projectName;
       this.flatType = flatType;
       this.applicationStatus = ApplicationStatus.PENDING;
       this.bookingStatus = BookingStatus.NOT_BOOKED;
@@ -28,40 +31,39 @@ public class Application implements Serializable {
       this.dateApplied = LocalDate.now();
    }
 
-   // to load data for data persistence
-   protected Application(int id, User applicant, Project project, FlatType flatType, ApplicationStatus applicationStatus, BookingStatus bookingStatus,
-                         WithdrawalRequestStatus withdrawalRequestStatus, LocalDate dateApplied) {
-      this.id = id;
-      this.applicant = applicant;
-      this.project = project;
-      this.flatType = flatType;
-      this.applicationStatus = applicationStatus;
-      this.bookingStatus = bookingStatus;
-      this.withdrawalRequestStatus = withdrawalRequestStatus;
-      this.dateApplied = dateApplied;
-   }
-
-   public int getId() {
+   public Integer getId() {
       return id;
    }
 
-   public User getApplicant() {
-      return applicant;
+   public String getApplicantName() {
+      return applicantName;
    }
 
-   public Project getProject() {
-      return project;
+   public String getApplicantNric() {
+      return applicantNric;
+   }
+
+   public Integer getProjectId() {
+      return projectId;
+   }
+
+   public String getProjectName() {
+      return projectName;
    }
 
    public FlatType getFlatType() {
       return flatType;
    }
 
+   public LocalDate getDateApplied() {
+      return dateApplied;
+   }
+
    public ApplicationStatus getApplicationStatus() {
       return applicationStatus;
    }
 
-   void setApplicationStatus(ApplicationStatus applicationStatus) {
+   public void setApplicationStatus(ApplicationStatus applicationStatus) {
       this.applicationStatus = applicationStatus;
    }
 
@@ -77,25 +79,23 @@ public class Application implements Serializable {
       return withdrawalRequestStatus;
    }
 
-   void setWithdrawalRequestStatus(WithdrawalRequestStatus withdrawalRequestStatus) {
+   public void setWithdrawalRequestStatus(WithdrawalRequestStatus withdrawalRequestStatus) {
       this.withdrawalRequestStatus = withdrawalRequestStatus;
-   }
+   /*@Override
+   String toString() {
+      return "============== Application ==============\n" +
+              "Application ID        : " + id + "\n" +
+              "Applicant Name        : " + applicantName + "\n" +
+              "Applicant NRIC         : " + applicantNric + "\n" +
+              "Project ID            : " + projectId + "\n" +
+              "Project Name          : " + projectName + "\n" +
+              "Flat Type             : " + flatType + "\n" +
+              "Application Status    : " + applicationStatus + "\n" +
+              "Booking Status        : " + bookingStatus + "\n" +
+              "Withdrawal Request Status : " + withdrawalRequestStatus + "\n" +
+              "Date Applied         : " + dateApplied + "\n" +
+              "==============================================";
+   }*/
 
-   public LocalDate getDateApplied() {
-      return dateApplied;
-   }
-
-   @Override
-   public String toString() {
-      return "Application {" +
-              "ID=" + id +
-              ", Applicant=" + applicant.getName() +
-              ", Project=" + project.getProjectName() +
-              ", Flat Type=" + flatType +
-              ", Application Status=" + applicationStatus +
-              ", Withdrawal Status=" + withdrawalRequestStatus +
-              ", Booking Status=" + bookingStatus +
-              ", Date Applied=" + dateApplied +
-              '}';
    }
 }
