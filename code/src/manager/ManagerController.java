@@ -4,18 +4,22 @@ import applicant.Application;
 import applicant.ApplicationStatus;
 import applicant.WithdrawalRequestStatus;
 import enquiry.Enquiry;
+import helper.Color;
 import officer.RegistrationForm;
 import officer.RegistrationStatus;
 import project.FlatType;
 import project.IProjectService;
 import project.Project;
+import project.UserFilterManager;
 import system.ServiceRegistry;
 import system.SessionManager;
+import user.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class ManagerController {
@@ -54,10 +58,25 @@ public class ManagerController {
          return null;
       }
       else {
+         UserFilterManager userFilterManager = new UserFilterManager(new Scanner(System.in));
+
+         User currentUser = ServiceRegistry.get(SessionManager.class).getCurrentUser();
+         userFilterManager.manageFilters(currentUser);
+         List<Project> filteredProjects = userFilterManager.applyFilters(projects, currentUser);
+
+         if (filteredProjects.isEmpty()) {
+            //Color.println("No projects match your filter.", Color.RED);
+            throw new Exception("No projects match your filter.");
+         }
+         else {
+            Color.println("--- Filtered Projects ---", Color.YELLOW);
+         }
+
+
          List<String> headerRow = List.of("Project ID", "Project Name", "Neighbourhood", "Visibility", "Two Room Units", "Two Room Price", "Three Room Units", "Three Room Price", "Appln..Opening Date", "Appln..Closing Date", "Manager", "Officer Slots", "Officers");
          List<List<String>> tableData = new ArrayList<>();
          tableData.add(headerRow);
-         for (Project p : projects) {
+         for (Project p : filteredProjects) {
             List<String> fromEachProject = p.toStringAsList();
             tableData.add(fromEachProject);
          }

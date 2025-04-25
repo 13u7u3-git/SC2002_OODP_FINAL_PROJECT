@@ -199,6 +199,7 @@ public class ManagerMenu extends Menu {
 
    /**
     * Displays all BTO projects in a tabular format.
+    * this is updated to use table printer
     */
    private void handleViewAllProjects() {
 
@@ -210,7 +211,7 @@ public class ManagerMenu extends Menu {
          }
          Color.println("---  All Projects ---", Color.YELLOW);
          Integer COLUMN_WIDTH = 15;
-         tablePrinter.printTable(COLUMN_WIDTH, tableData);
+         tablePrinter.printTable(COLUMN_WIDTH, tableData); //old way
       }
       catch (Exception e) {
          Color.println("Error: " + e.getMessage(), Color.RED);
@@ -226,6 +227,7 @@ public class ManagerMenu extends Menu {
          List<List<String>> tableData = managerController.getMyProjectsTableData();
          if (tableData.isEmpty()) {
             Color.println("No projects found.", Color.RED);
+            Color.println("You have not created any projects yet.", Color.RED);
             return;
          }
          Color.println("---  All Projects ---", Color.YELLOW);
