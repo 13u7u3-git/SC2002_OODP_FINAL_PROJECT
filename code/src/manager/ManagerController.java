@@ -309,7 +309,7 @@ public class ManagerController {
          row.add(app.getFlatType().toString());
          row.add(currentProject.getId().toString());
          row.add(currentProject.getProjectName());
-         row.add(((ServiceRegistry.get(SessionManager.class).getUserByName(app.getApplicantName()))).toString());
+         row.add(app.getApplicationStatus().toString());
          reportData.add(row);
       }
 

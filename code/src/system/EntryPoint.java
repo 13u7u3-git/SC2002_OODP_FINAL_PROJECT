@@ -41,7 +41,7 @@ public class EntryPoint {
       LoginMenu loginMenu = new LoginMenu(sessionManager, scanner);
       Color.println("Welcome to the BTO System!", Color.CYAN);
 
-      sessionManager.getProjectRegistry().createDummyProjects();
+      //sessionManager.getProjectRegistry().createDummyProjects();
 
       while (running) {
          // Get current menu based on user state
@@ -60,7 +60,7 @@ public class EntryPoint {
             }
             else if (user instanceof Officer) {
                Color.println("Officer logged in.", Color.GREEN);
-               Color.println("Choose to be Applicant or officer:");
+               Color.println("Choose to be Applicant or officer: (1/0)");
 
                // surround using try and catch, and then the user will input 1 or 2 to choose between applicant or officer. if he choose applicabnt tthen we will wrap current user as applicant and run the appklicant menu. if he choose officer then we will wrap current user as officer and run the officer menu.
                String input = scanner.nextLine();

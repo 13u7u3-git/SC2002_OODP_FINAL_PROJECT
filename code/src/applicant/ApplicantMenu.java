@@ -554,7 +554,8 @@ public class ApplicantMenu extends Menu {
          }
 
          // Confirmation
-         Color.print("Are you sure you want to permanently delete enquiry ID :" + selectedEnquiry.getId(), Color.YELLOW);
+         Color.print("Are you sure you want to permanently delete enquiry ID :" + selectedEnquiry.getId() + "  (y)  ",
+                 Color.YELLOW);
          String confirm = scanner.nextLine().trim();
          if (!confirm.equalsIgnoreCase("y")) {
             Color.println("Deletion cancelled.", Color.YELLOW);

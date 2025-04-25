@@ -18,7 +18,6 @@ import user.User;
 import user.UserRegistry;
 
 import java.util.List;
-import java.util.Map;
 
 public class OfficerService implements IOfficerService, StaffService {
    private final IProjectService projectService;
@@ -158,17 +157,18 @@ public class OfficerService implements IOfficerService, StaffService {
 
       // Check and decrement flat count
       FlatType flatType = application.getFlatType();
-      Map<FlatType, Integer> remainingFlats = project.getRemainingFlats();
+      /*Map<FlatType, Integer> remainingFlats = project.getRemainingFlats();
 
       if (!remainingFlats.containsKey(flatType) || remainingFlats.get(flatType) <= 0) {
          throw new IllegalStateException("No available " + flatType.toString().toLowerCase().replace("_", "-") + " flats left.");
       }
-
-      remainingFlats.put(flatType, remainingFlats.get(flatType) - 1);
+      remainingFlats.put(flatType, remainingFlats.get(flatType) - 1);*/
 
       // Update project and application
       projectService.updateProject(project, flatType);
+      System.out.println("Booked a " + flatType.toString().toLowerCase().replace("_", "-") + " flat.");
       application.setBookingStatus(BookingStatus.BOOKED);
+      System.out.println("Booking successful.");
       //projectService.updateApplicationStatus(application);
 
 

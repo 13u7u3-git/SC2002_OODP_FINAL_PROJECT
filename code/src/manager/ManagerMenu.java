@@ -221,7 +221,22 @@ public class ManagerMenu extends Menu {
     * Displays projects created by the current manager.
     */
    private void handleFilterMyProjects() {
-      managerController.getMyProjectsTableData();
+
+      try {
+         List<List<String>> tableData = managerController.getMyProjectsTableData();
+         if (tableData.isEmpty()) {
+            Color.println("No projects found.", Color.RED);
+            return;
+         }
+         Color.println("---  All Projects ---", Color.YELLOW);
+         Integer COLUMN_WIDTH = 15;
+         tablePrinter.printTable(COLUMN_WIDTH, tableData);
+      }
+      catch (Exception e) {
+         Color.println("Error: " + e.getMessage(), Color.RED);
+      }
+
+
    }
 
    /**
@@ -240,19 +255,25 @@ public class ManagerMenu extends Menu {
     * Toggles the visibility of a project to make it available or unavailable to applicants.
     */
    private void handleToggleVisibility() {
-      Color.println("My Projects:", Color.GREEN);
-      managerController.getMyProjectsTableData();//prints my projects on screen
-      Color.print("Enter Project ID to toggle visibility:", Color.GREEN);
-      Integer projectId = Integer.parseInt(scanner.nextLine());
-      if (projectId == null) {
-         Color.println("Invalid Project ID.", Color.RED);
-         return;
+      try {
+         Color.println("My Projects:", Color.GREEN);
+
+         handleFilterMyProjects();
+         Color.print("Enter Project ID to toggle visibility:", Color.GREEN);
+         Integer projectId = Integer.parseInt(scanner.nextLine());
+         if (projectId == null) {
+            Color.println("Invalid Project ID.", Color.RED);
+            return;
+         }
+         if (managerController.toggleVisibility(projectId)) {
+            Color.println("Visibility toggled successfully!", Color.GREEN);
+         }
+         else {
+            Color.println("Visibility toggle failed.", Color.RED);
+         }
       }
-      if (managerController.toggleVisibility(projectId)) {
-         Color.println("Visibility toggled successfully!", Color.GREEN);
-      }
-      else {
-         Color.println("Visibility toggle failed.", Color.RED);
+      catch (Exception e) {
+         Color.println("Error: " + e.getMessage(), Color.RED);
       }
 
    }

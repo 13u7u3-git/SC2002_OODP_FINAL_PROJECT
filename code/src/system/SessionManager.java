@@ -115,7 +115,7 @@ public class SessionManager implements Serializable {
 
    public void login(String nric, String password) {
       try {
-         User u = userRegistry.getUser(nric);
+         User u = userRegistry.getUserByNric(nric);
 
          if (u != null) {
             passwordValidationService.isPasswordMatch(u, password);

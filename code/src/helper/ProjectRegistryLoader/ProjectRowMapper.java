@@ -31,7 +31,7 @@ public class ProjectRowMapper implements RowMapper<Project> { // Implement the i
    @Override // Implementing the RowMapper interface method
    public Project mapRow(String[] parts) throws Exception {
       // Generate a unique ID for this project based on the load order
-      uniqueIdService.resetId(IdType.PROJECT_ID);
+      //uniqueIdService.resetId(IdType.PROJECT_ID);
       int generatedId = uniqueIdService.generateUniqueId(IdType.PROJECT_ID); // Starts from 1 for the first row
 
       // Use the utility to parse the 12 data fields from the parts array

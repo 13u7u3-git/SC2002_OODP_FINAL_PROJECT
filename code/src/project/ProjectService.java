@@ -157,7 +157,9 @@ public class ProjectService implements IProjectService {
    @Override
    public void updateProject(Project project, FlatType flatType) {
       Project existingProject = getProjectById(project.getId());
-      existingProject.decrementRemainingFlat(flatType);
+      System.out.println("Updating project: " + existingProject.getProjectName());
+      //existingProject.decrementRemainingFlat(flatType);
+      System.out.println("Remaining flats after decrement: " + existingProject.getRemainingFlats());
    }
 
 

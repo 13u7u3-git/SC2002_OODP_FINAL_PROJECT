@@ -1,8 +1,11 @@
 package manager;
 
+import applicant.Application;
 import applicant.ApplicationStatus;
+import applicant.BookingStatus;
 import applicant.WithdrawalRequestStatus;
 import enquiry.Enquiry;
+import helper.Color;
 import interfaces.StaffService;
 import officer.IOfficerService;
 import officer.RegistrationForm;
@@ -90,8 +93,8 @@ public class ManagerService implements IManagerService, StaffService {
 
    @Override
    public List<Project> getMyProjects() {
-      //System.out.println("Manager: " + manager.getNric());
-      return projectService.getFilteredProjects(project -> project.getManager().equals(this.manager.getName()));
+      //System.out.println("Returning all projects managed by the manager");
+      return projectService.getFilteredProjects(project -> project.getManager().equals(manager.getName()));
    }
 
    @Override
@@ -177,14 +180,23 @@ public class ManagerService implements IManagerService, StaffService {
       if (enquiry == null) {
          return false;
       }
-      enquiry.setReply(reply);
-      return true;
+      if (enquiry.getReply() == null || enquiry.getReply().isEmpty()) {
+         enquiry.setReply(reply);
+         Color.println("Enquiry replied successfully.", Color.GREEN);
+         return true;
+      }
+      return false;
    }
 
    @Override
    public void updateWithdrawalRequestStatus(String withdrawalRequestId, WithdrawalRequestStatus status) throws Exception {
       try {
-         manager.getCurrentProject().getApplications().stream().filter(x -> x.getId().equals(Integer.parseInt(withdrawalRequestId))).findFirst().get().setWithdrawalRequestStatus(status);
+         Application application =
+                 manager.getCurrentProject().getApplications().stream().filter(x -> x.getId().equals(Integer.parseInt(withdrawalRequestId))).findFirst().get();
+
+         application.setWithdrawalRequestStatus(status);
+         application.setBookingStatus(BookingStatus.NOT_BOOKED);
+         application.setStatus(ApplicationStatus.UNSUCCESSFUL);
       }
       catch (Exception e) {
          throw new Exception("Application not found: " + e.getMessage());

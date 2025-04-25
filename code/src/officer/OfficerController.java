@@ -139,8 +139,13 @@ public class OfficerController {
       if (enquiry == null) {
          return false;
       }
-      enquiry.setReply(reply);
-      return true;
+
+      if (enquiry.getReply() == null || enquiry.getReply().isEmpty()) {
+         enquiry.setReply(reply);
+         Color.println("Enquiry replied successfully.", Color.GREEN);
+         return true;
+      }
+      return false;
    }
 }
 

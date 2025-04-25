@@ -58,6 +58,12 @@ public class ApplicantService implements IApplicantService {
             return true;
          }
 
+         List<String> officers = project.getOfficers();
+
+         if (officers.contains(applicant.getName())) {
+            return false;
+         }
+
          // Check visibility
          if (!project.isVisibility()) {
             return false;

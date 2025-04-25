@@ -30,7 +30,7 @@ public class Project implements Serializable {
    private String neighborhood;
    private LocalDate applicationOpeningDate;
    private LocalDate applicationClosingDate;
-   private boolean visibility = false;
+   private boolean visibility = true;
    private Integer availableOfficerSlots;
 
    // Use this when Manager wants to create a new project
@@ -210,7 +210,7 @@ public class Project implements Serializable {
               "Closing Date        : " + applicationClosingDate + "\n" +
               "Manager             : " + manager + "\n" +
               "Officer Slots       : " + availableOfficerSlots + "\n" +
-              "Officers            : " + officers + "\n" +
+              "Officers            : " + ((officers.isEmpty()) ? "N/A" : officers) + "\n" +
               "==============================================";
    }
 

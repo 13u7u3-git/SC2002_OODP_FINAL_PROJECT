@@ -2,6 +2,7 @@ package enquiry;
 
 import UniqueID.IUniqueIdService;
 import UniqueID.IdType;
+import applicant.Applicant;
 import helper.Color;
 import project.IProjectService;
 import project.Project;
@@ -37,6 +38,7 @@ public class EnquiryService {
             throw new IllegalArgumentException("Something went wrong while creating enquiry. Try again.");
          }
          enquiry.setEnquiry(message);
+
          return enquiry;//success
       }
       catch (Exception e) {
@@ -48,6 +50,13 @@ public class EnquiryService {
 
    public void submitEnquiry(Enquiry enquiry) throws IllegalArgumentException {
       try {
+
+         Applicant applicant = (Applicant) ServiceRegistry.get(SessionManager.class).getUserByName(enquiry.getApplicantName());
+
+         if (applicant == null) {
+            throw new IllegalArgumentException("Applicant not found.");
+         }
+         applicant.getEnquiries().add(enquiry);
          projectService.addEnquiryToProject(enquiry);
       }
       catch (Exception e) {
@@ -82,11 +91,13 @@ public class EnquiryService {
       if (!enquiry.getApplicantNric().equals(sessionManager.getCurrentUser().getNric())) {
          throw new IllegalArgumentException("You are not allowed to delete this enquiry.");
       }
-
+      Applicant applicant = (Applicant) ServiceRegistry.get(SessionManager.class).getUserByName(enquiry.getApplicantName());
       // Check if the enquiry has a reply (can't delete)
       if (enquiry.getReply() != null && !enquiry.getReply().isBlank()) {
          throw new IllegalArgumentException("Cannot delete enquiry with a reply.");
       }
+      applicant.getEnquiries().remove(enquiry);
+      Color.println("Enquiry deleted successfully.", Color.GREEN);
       projectService.removeEnquiryFromProject(enquiry);
    }
 

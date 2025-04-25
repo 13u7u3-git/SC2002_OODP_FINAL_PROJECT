@@ -51,7 +51,7 @@ public class OfficerMenu extends Menu {
          case "2" -> handleRegisterAsOfficer();
          case "3" -> handleViewOfficerRegistrationStatus();
          case "4" -> handleViewHandledProjectDetails();
-         case "5" -> handleViewAndReplyToEnquiries();
+         case "5" -> handleReplyToProjectEnquiries();
          case "6" -> handleManageFlatSelection(); //
          case "7" -> handleChangePassword();
          case "0" -> {
@@ -263,7 +263,7 @@ public class OfficerMenu extends Menu {
 
          Color.println("--- Approved Applications ---", Color.YELLOW);
          for (Application a : apps) {
-            Color.println("ID: " + a.getId() + " | " + a.getApplicantName() + " | " + a.getFlatType() + " | " + a.getBookingStatus(), Color.CYAN);
+            Color.println("ID: " + a.getId() + " | " + a.getApplicantName() + " | " + a.getFlatType() + " | " + a.getBookingStatus(), Color.YELLOW);
          }
 
          //((ServiceRegistry.get(SessionManager.class).getUserByName(app.getApplicantName())))
